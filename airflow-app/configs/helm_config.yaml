@@ -1,0 +1,181 @@
+###################################
+# Airflow - Common Configs
+###################################
+airflow:
+  ## the airflow executor type to use
+  ##
+  executor: CeleryExecutor
+
+  ## the fernet key used to encrypt the connections in the database
+  ##
+  fernetKey: "rBOxg2luDCQEORsfklEwwClNDW8Exaiyn7oMbzIWCcE="
+
+  ## the secret_key for flask (sets `AIRFLOW__WEBSERVER__SECRET_KEY`)
+  ## - [WARNING] you must change this value to ensure the security of your airflow
+  ## - set `AIRFLOW__WEBSERVER__SECRET_KEY` with `airflow.extraEnv` from a Secret to avoid storing this in your values
+  ##
+  #
+  webserverSecretKey: "test123"
+
+  ## environment variables for the web/scheduler/worker Pods (for airflow configs)
+  ##
+  config:
+    # Path
+    AIRFLOW__WEBSERVER__BASE_URL: 'http://34.96.87.92/airflow'
+
+    # Flower
+    AIRFLOW__CELERY__FLOWER_URL_PREFIX: '/flower'
+
+    # Security
+    AIRFLOW__WEBSERVER__EXPOSE_CONFIG: "True"
+
+    # DAGS
+    AIRFLOW__CORE__LOAD_EXAMPLES: "False"
+    AIRFLOW__CODE__DAGS_FOLDER: "/opt/airflowi/dags/repo/airflow-app/dags"
+
+    #PLUGINS
+    AIRFLOW__CORE__PLUGINS_FOLDER: "/opt/airflow/dags/repo/airflow-app/plugins"
+
+    ## Disable noisy "Handling signal: ttou" Gunicorn log messages
+    GUNICORN_CMD_ARGS: "--log-level WARNING"
+
+  ## a list of initial users to create
+  ##
+  users:
+    - username: admin
+      password: admin
+      role: Admin
+      email: admin@example.com
+      firstName: admin
+      lastName: admin
+
+  ## a list of initial variables to create
+  ##
+  variables:
+    - key: "environment"
+      value: "dev"
+
+  ## a list of initial pools to create
+  ##
+  pools:
+    - name: "pool_1"
+      slots: 5
+      description: "example pool with 5 slots"
+    - name: "pool_2"
+      slots: 10
+      description: "example pool with 10 slots"
+
+###################################
+# Airflow - Scheduler Configs
+###################################
+scheduler:
+  replicas: 1
+
+###################################
+# Airflow - Worker Configs
+###################################
+workers:
+  enabled: true
+  replicas: 2
+  autoscaling:
+    enabled: true
+    maxReplicas: 8
+    metrics:
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
+
+###################################
+# Airflow - Flower Configs
+###################################
+flower:
+  enabled: true
+
+###################################
+# Airflow - Logs Configs
+###################################
+logs:
+  persistence:
+    enabled: false
+
+###################################
+# Airflow - DAGs Configs
+###################################
+dags:
+  gitSync:
+    enabled: true
+    repo: "git@github.com:otaviocals/klarna_case.git"
+    repoHost: "github.com"
+    repoSubPath: ""
+    branch: pre-release
+    revision: HEAD
+    syncWait: 30
+    sshSecret: airflow-ssh-secret
+    sshSecretKey: gitSshKey
+    sshKnownHosts: |-
+      github.com ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ==
+###################################
+# Database - PostgreSQL Chart
+###################################
+postgresql:
+  enabled: true
+
+###################################
+# Database - Redis Chart
+###################################
+redis:
+  enabled: true
+
+###################################
+## DATABASE | Embedded Postgres
+###################################
+postgresql:
+  enabled: true
+  postgresqlDatabase: airflow
+  postgresqlUsername: postgres
+  postgresqlPassword: airflow
+  existingSecret: ""
+  existingSecretKey: "postgresql-password"
+  persistence:
+    enabled: true
+    storageClass: "local-storage"
+    accessModes:
+      - ReadWriteOnce
+
+    size: 1Gi
+
+  master:
+    nodeSelector: {}
+    affinity: {}
+    tolerations: []
+    podAnnotations:
+      cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
+
+###################################
+## COMPONENT | Airflow Webserver
+###################################
+web:
+  replicas: 2
+  service:
+    type: ClusterIP
+    ports:
+      - protocol: TCP
+        port: 8080
+        targetPort: 8080
+
+###################################
+## CONFIG | Kubernetes Ingress
+###################################
+ingress:
+  enabled: true
+  apiVersion: networking.k8s.io/v1
+  
+  ## airflow webserver ingress configs
+  web:
+    annotations:
+      kubernetes.io/ingress.class: nginx
+    host: 
+    path: "/airflow"

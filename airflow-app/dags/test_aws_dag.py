@@ -54,7 +54,7 @@ with DAG(
                     "DataSource": {
                         "S3DataSource": {
                             "S3DataType": "S3Prefix",
-                            "S3Uri": "s3://klarna-case-model-bucket/credit-model/train/raw-train-data/raw-train-data.csv",
+                            "S3Uri": "s3://klarna-case-model-bucket/credit-model/train/raw-train-data/raw-train-data.csv/{{ ti.xcom_pull(task_ids='run_query_test', key='return_value') }}.csv",
                             "S3DataDistributionType": "FullyReplicated",
                         }
                     },

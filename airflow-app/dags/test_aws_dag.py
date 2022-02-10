@@ -4,6 +4,7 @@ from airflow import DAG
 from airflow.operators.bash import BashOperator
 from airflow.operators.dummy import DummyOperator
 from airflow.utils.dates import days_ago
+from airflow.providers.amazon.aws.operators.athena import AWSAthenaOperator
 
 import boto3
 
@@ -21,35 +22,15 @@ with DAG(
     params={"example_key": "example_value"},
 ) as dag:
 
-    run_this_last = DummyOperator(
-        task_id="run_this_last",
+    test_athena_operator = AWSAthenaOperator(
+        task_id=f"run_query_test",
+        query="select * from credit_train_data where has_paid=TRUE",
+        output_location="s3://klarna-case-model-bucket/credit-model/train/raw-train-data/",
+        database="klarna_case",
     )
 
-    run_this = BashOperator(
-        task_id="run_after_loop",
-        bash_command="echo 1",
-    )
 
-    for i in range(3):
-        task = BashOperator(
-            task_id="runme_" + str(i),
-            bash_command='echo "{{ task_instance_key_str }}" && sleep 1',
-        )
-        task >> run_this
-
-    also_run_this = BashOperator(
-        task_id="also_run_this",
-        bash_command='echo "run_id={{ run_id }} | dag_run={{ dag_run }}"',
-    )
-
-    this_will_skip = BashOperator(
-        task_id="this_will_skip",
-        bash_command='echo "hello world"; exit 99;',
-    )
-
-run_this >> run_this_last
-this_will_skip >> run_this_last
-also_run_this >> run_this_last
+test_athena_operator
 
 if __name__ == "__main__":
     dag.cli()

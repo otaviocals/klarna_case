@@ -1,6 +1,9 @@
 version: 0.2
 
 
+env:
+  parameter-store:
+    ssh_key: klarna-case-deploy-key
 phases:
   install:
     commands:
@@ -13,6 +16,10 @@ phases:
   pre_build:
     commands:
       - echo Entered the pre_build phase...
+      - echo Get ssh key
+      - mkdir -p ~/.ssh
+      - echo "$ssh_key" > ~/.ssh/klarna-deploy-key
+      - chmod 600 ~/.ssh/klarna-deploy-key
       - echo Check airflow-app code
       - python3 -m black --check airflow-app/
     finally:
@@ -21,7 +28,7 @@ phases:
     commands:
       - echo Entered the build phase...
       - echo Build started on `date`
-      - scp airflow-app/configs/* admin@ec2-54-88-231-167.compute-1.amazonaws.com:~/airflow-configs/
+      - scp -i ~/.ssh/klarna-deploy-key airflow-app/configs/* admin@ec2-54-88-231-167.compute-1.amazonaws.com:~/airflow-configs/
     finally:
       - echo This always runs even if the install command fails
   post_build:

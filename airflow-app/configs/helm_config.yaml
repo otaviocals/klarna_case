@@ -39,9 +39,6 @@ airflow:
     ## Disable noisy "Handling signal: ttou" Gunicorn log messages
     GUNICORN_CMD_ARGS: "--log-level WARNING"
 
-  # Extra packages
-  extraPipPackages:
-    - "sagemaker"
   ## a list of initial users to create
   ##
   users:
@@ -73,9 +70,6 @@ airflow:
 ###################################
 scheduler:
   replicas: 1
-  extraPipPackages:
-    - "boto3"
-    - "sagemaker"
 
 ###################################
 # Airflow - Worker Configs

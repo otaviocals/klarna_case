@@ -12,7 +12,7 @@ args = {
 }
 
 with DAG(
-    dag_id="test_dag",
+    dag_id="test_dag_aws",
     default_args=args,
     schedule_interval="0 0 * * *",
     start_date=days_ago(2),

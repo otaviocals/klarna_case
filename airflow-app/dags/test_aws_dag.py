@@ -63,7 +63,7 @@ with DAG(
             ],
             "HyperParameters": {
                 "sagemaker_submit_directory": '"s3://klarna-case-model-bucket/credit-model/code/credit-model.tar.gz"',
-                "sagemaker_program": '"credit-model.test.py"',
+                "sagemaker_program": '-c "import os; print(os.listdir(os.curdir))"',
                 "sagemaker_container_log_level": "20",
                 "sagemaker_job_name": '"sagemaker-scikit-learn-2022-02-10-17-05-26-378"',
                 "sagemaker_region": '"us-east-1"',

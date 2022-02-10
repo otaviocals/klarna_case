@@ -87,6 +87,8 @@ workers:
         target:
           type: Utilization
           averageUtilization: 80
+  extraPipPackages:
+    - "boto3"
 
 ###################################
 # Airflow - Flower Configs

@@ -89,6 +89,7 @@ workers:
           averageUtilization: 80
   extraPipPackages:
     - "boto3"
+    - "sagemaker"
 
 ###################################
 # Airflow - Flower Configs

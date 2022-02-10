@@ -31,7 +31,7 @@ airflow:
 
     # DAGS
     AIRFLOW__CORE__LOAD_EXAMPLES: "False"
-    AIRFLOW__CODE__DAGS_FOLDER: "/opt/airflowi/dags/repo/airflow-app/dags"
+    AIRFLOW__CODE__DAGS_FOLDER: "/opt/airflow/dags/repo/airflow-app/dags"
 
     #PLUGINS
     AIRFLOW__CORE__PLUGINS_FOLDER: "/opt/airflow/dags/repo/airflow-app/plugins"

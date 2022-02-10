@@ -28,9 +28,16 @@ with DAG(
     test_athena_operator = AWSAthenaOperator(
         task_id=f"run_query_test",
         query="select * from credit_train_data where has_paid=TRUE",
-        output_location="s3://klarna-case-model-bucket/credit-model/train/raw-train-data/raw-train-data.csv",
+        output_location="s3://klarna-case-model-bucket/credit-model/train/raw-train-data/{{ ds_nodash }}",
         database="klarna_case",
     )
+
+    MODEL_NAME = "credit-model"
+    BUCKET_NAME = "klarna-case-bucket"
+    SM_ROLE = "klarna-case-sm-role"
+    TRAIN_SCRIPT = "test.py"
+    REGION = "us-east-1"
+    QUERY_DATA_TASK_ID = "run_query_test"
 
     train_op = SageMakerTrainingOperator(
         task_id="test_training",
@@ -40,7 +47,7 @@ with DAG(
                 "TrainingInputMode": "File",
             },
             "OutputDataConfig": {
-                "S3OutputPath": "s3://sagemaker-us-east-1-025105345127/"
+                "S3OutputPath": "s3://{ BUCKET_NAME }/{ MODEL_NAME }/train/output-data/{{ ds_nodash }}"
             },
             "StoppingCondition": {"MaxRuntimeInSeconds": 86400},
             "ResourceConfig": {
@@ -48,13 +55,13 @@ with DAG(
                 "InstanceType": "ml.c4.xlarge",
                 "VolumeSizeInGB": 30,
             },
-            "RoleArn": "klarna-case-sm-role",
+            "RoleArn": SM_ROLE,
             "InputDataConfig": [
                 {
                     "DataSource": {
                         "S3DataSource": {
                             "S3DataType": "S3Prefix",
-                            "S3Uri": "s3://klarna-case-model-bucket/credit-model/train/raw-train-data/raw-train-data.csv/{{ ti.xcom_pull(task_ids='run_query_test', key='return_value') }}.csv",
+                            "S3Uri": "s3://{ BUCKET_NAME }/{ MODEL_NAME }/train/raw-train-data/{{ ds_nodash }}/{{ ti.xcom_pull(task_ids=QUERY_DATA_TASK_ID, key='return_value') }}.csv",
                             "S3DataDistributionType": "FullyReplicated",
                         }
                     },
@@ -62,13 +69,13 @@ with DAG(
                 }
             ],
             "HyperParameters": {
-                "sagemaker_submit_directory": '"s3://klarna-case-model-bucket/credit-model/code/credit-model-1.0.tar.gz"',
-                "sagemaker_program": '"credit-model-1.0/credit-model/test.py"',
+                "sagemaker_submit_directory": '"s3://{ BUCKET_NAME }/{ MODEL_NAME }/code/{ MODEL_NAME }-1.0.tar.gz"',
+                "sagemaker_program": '"{ MODEL_NAME }-1.0/{ MODEL_NAME }/{ TRAIN_SCRIPT }"',
                 "sagemaker_container_log_level": "20",
-                "sagemaker_job_name": '"sagemaker-scikit-learn-2022-02-10-17-05-26-378"',
-                "sagemaker_region": '"us-east-1"',
+                "sagemaker_job_name": '"{ MODEL_NAME }-{{ ts_nodash }}"',
+                "sagemaker_region": "{ REGION }",
             },
-            "TrainingJobName": "sagemaker-scikit-learn-2022-02-10-17-05-26-378",
+            "TrainingJobName": "{ MODEL_NAME }-{{ ts_nodash }}",
         },
         wait_for_completion=True,
         dag=dag,

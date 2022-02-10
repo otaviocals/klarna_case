@@ -31,8 +31,14 @@ phases:
     commands:
       - echo Entered the build phase...
       - echo Build started on `date`
+      - echo Deploying Airflow
       - scp -i ~/.ssh/klarna-deploy-key -o StrictHostKeyChecking=no  airflow-app/configs/* admin@44.199.54.220:~/airflow-configs/
       - ssh -i ~/.ssh/klarna-deploy-key -o StrictHostKeyChecking=no  admin@44.199.54.220 -- 'kubectl create secret generic airflow-ssh-secret -n=airflow --from-file=gitSshKey=.ssh/github_key --dry-run=client -o=yaml > airflow-configs/airflow-github-secret.yaml && kubectl apply -f airflow-configs/airflow_config.yaml && kubectl apply -f airflow-configs/airflow-github-secret.yaml && helm upgrade --install airflow airflow-stable/airflow --namespace airflow --version "8.5.2" --values ./airflow-configs/helm_config.yaml'
+      - echo Deploying Credit Model
+      - cd models/credit-model
+      - python3 setup.py sdist
+      - aws s3 sync dist/credit-model-1.0.tar.gz s3://klarna-case-model-bucket/credit-model/code/credit-model-1.0.tar.gz 
+      - cd ../..
     finally:
       - echo This always runs even if the install command fails
   post_build:

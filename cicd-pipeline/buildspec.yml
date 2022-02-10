@@ -4,6 +4,7 @@ version: 0.2
 env:
   parameter-store:
     ssh_key: klarna-case-deploy-key
+    ssh_pub: klarna-case-deploy-key.pub
 phases:
   install:
     commands:
@@ -19,6 +20,7 @@ phases:
       - echo Get ssh key
       - mkdir -p ~/.ssh
       - echo "$ssh_key" > ~/.ssh/klarna-deploy-key
+      - echo "$ssh_pub" > ~/.ssh/klarna-deploy-key.pub
       - chmod 600 ~/.ssh/klarna-deploy-key
       - eval "$(ssh-agent -s)"
       - echo Check airflow-app code

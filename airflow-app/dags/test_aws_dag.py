@@ -10,8 +10,6 @@ from airflow.contrib.operators.sagemaker_training_operator import (
 )
 
 import boto3
-from sagemaker.workflow.airflow import transform_config_from_estimator
-from sagemaker.sklearn.estimator import SKLearn
 
 args = {
     "owner": "airflow",

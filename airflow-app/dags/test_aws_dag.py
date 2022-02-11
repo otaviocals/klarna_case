@@ -33,7 +33,7 @@ with DAG(
     )
 
     MODEL_NAME = "credit-model"
-    BUCKET_NAME = "klarna-case-bucket"
+    BUCKET_NAME = "klarna-case-model-bucket"
     SM_ROLE = "klarna-case-sm-role"
     TRAIN_SCRIPT = "test.py"
     REGION = "us-east-1"

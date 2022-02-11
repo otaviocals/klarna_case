@@ -70,9 +70,7 @@ def generate_sagemaker_train_config(
     return config
 
 
-def generate_sagemaker_model_config(
-    MODEL_NAME, MODEL_SCRIPT, CODE_DIR, REGION, MODEL_PATH, SM_ROLE, TRAIN_TASK_ID
-):
+def generate_sagemaker_model_config(MODEL_NAME, MODEL_SCRIPT, TRAIN_TASK_ID):
 
     sub_dir = (
         "{{ ti.xcom_pull(task_ids='"
@@ -110,7 +108,7 @@ def generate_sagemaker_model_config(
         "PrimaryContainer": {
             "Image": "683313688378.dkr.ecr.us-east-1.amazonaws.com/sagemaker-scikit-learn:0.23-1-cpu-py3",
             "Environment": {
-                "SAGEMAKER_PROGRAM": program,
+                "SAGEMAKER_PROGRAM": MODEL_SCRIPT,
                 "SAGEMAKER_SUBMIT_DIRECTORY": sub_dir,
                 "SAGEMAKER_CONTAINER_LOG_LEVEL": "20",
                 "SAGEMAKER_REGION": region,
@@ -170,10 +168,6 @@ with DAG(
         config=generate_sagemaker_model_config(
             "credit-model",
             "train.py",
-            "",  ###################### FIX
-            "us-east-1",
-            "",  ############################FIX
-            "klarna-case-sm-role",
             "test_training",
         ),
         dag=dag,

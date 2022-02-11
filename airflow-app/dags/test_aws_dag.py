@@ -77,7 +77,7 @@ def generate_sagemaker_model_config(
     sub_dir = (
         "{{ ti.xcom_pull(task_ids='"
         + TRAIN_TASK_ID
-        + "', key='return_value')['Training']['HyperParameters']['sagemaker_submit_directory'] }}"
+        + "', key='return_value')['Training']['HyperParameters']['sagemaker_submit_directory'].strip('\\\"') }}"
     )
     print(sub_dir)
     # train_return_dict = yaml.load(train_return)

@@ -59,7 +59,7 @@ with DAG(
                 "InstanceType": "ml.c4.xlarge",
                 "VolumeSizeInGB": 30,
             },
-            "RoleArn": SM_ROLE,
+            "RoleArn": "" + SM_ROLE,
             "InputDataConfig": [
                 {
                     "DataSource": {

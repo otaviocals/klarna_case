@@ -40,7 +40,7 @@ phases:
       - python3 setup.py sdist
       - aws s3 sync dist s3://klarna-case-model-bucket/credit-model/code
       - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 025105345127.dkr.ecr.us-east-1.amazonaws.com
-      - pack build --builder=public.ecr.aws/docker/library/buildpack-deps:latest 025105345127.dkr.ecr.us-east-1.amazonaws.com/klarna-case
+      - pack build --builder=gcr.io/buildpacks/builder 025105345127.dkr.ecr.us-east-1.amazonaws.com/klarna-case
       - docker push 025105345127.dkr.ecr.us-east-1.amazonaws.com/klarna-case
       - cd ../..
     finally:

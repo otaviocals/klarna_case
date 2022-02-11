@@ -55,17 +55,13 @@ with DAG(
                 "InstanceType": "ml.c4.xlarge",
                 "VolumeSizeInGB": 30,
             },
-            "RoleArn": "{ SM_ROLE }".format(SM_ROLE=SM_ROLE),
+            "RoleArn": "{{ SM_ROLE }}",
             "InputDataConfig": [
                 {
                     "DataSource": {
                         "S3DataSource": {
                             "S3DataType": "S3Prefix",
-                            "S3Uri": "s3://{ BUCKET_NAME }/{ MODEL_NAME }/train/raw-train-data/{{ ds_nodash }}/{{ ti.xcom_pull(task_ids={ QUERY_DATA_TASK_ID }, key='return_value') }}.csv".format(
-                                BUCKET_NAME=BUCKET_NAME,
-                                MODEL_NAME=MODEL_NAME,
-                                QUERY_DATA_TASK_ID=QUERY_DATA_TASK_ID,
-                            ),
+                            "S3Uri": "s3://{{ BUCKET_NAME }}/{{ MODEL_NAME }}/train/raw-train-data/{{ ds_nodash }}/{{ ti.xcom_pull(task_ids={{ QUERY_DATA_TASK_ID }}, key='return_value') }}.csv",
                             "S3DataDistributionType": "FullyReplicated",
                         }
                     },
@@ -73,21 +69,13 @@ with DAG(
                 }
             ],
             "HyperParameters": {
-                "sagemaker_submit_directory": '"s3://{ BUCKET_NAME }/{ MODEL_NAME }/code/{ MODEL_NAME }-1.0.tar.gz"'.format(
-                    BUCKET_NAME=BUCKET_NAME, MODEL_NAME=MODEL_NAME
-                ),
-                "sagemaker_program": '"{ MODEL_NAME }-1.0/{ MODEL_NAME }/{ TRAIN_SCRIPT }"'.format(
-                    MODEL_NAME=MODEL_NAME, TRAIN_SCRIPT=TRAIN_SCRIPT
-                ),
+                "sagemaker_submit_directory": '"s3://{{ BUCKET_NAME }}/{{ MODEL_NAME }}/code/{{ MODEL_NAME }}-1.0.tar.gz"',
+                "sagemaker_program": '"{{ MODEL_NAME }}-1.0/{{ MODEL_NAME }}/{{ TRAIN_SCRIPT }}"',
                 "sagemaker_container_log_level": "20",
-                "sagemaker_job_name": '"{ MODEL_NAME }-{{ ts_nodash }}"'.format(
-                    MODEL_NAME=MODEL_NAME
-                ),
-                "sagemaker_region": "{ REGION }".format(REGION=REGION),
+                "sagemaker_job_name": '"{{ MODEL_NAME }}-{{ ts_nodash }}"',
+                "sagemaker_region": "{{ REGION }}",
             },
-            "TrainingJobName": "{ MODEL_NAME }-{{ ts_nodash }}".format(
-                MODEL_NAME=MODEL_NAME
-            ),
+            "TrainingJobName": "{{ MODEL_NAME }}-{{ ts_nodash }}",
         },
         wait_for_completion=True,
         dag=dag,

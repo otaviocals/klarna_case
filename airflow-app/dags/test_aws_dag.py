@@ -71,7 +71,7 @@ def generate_sagemaker_train_config(
 
 
 def generate_sagemaker_model_config(
-    MODEL_NAME, MODEL_SCRIPT, CODE_DIR, REGION, MODEL_PATHi, SM_ROLE, TRAIN_TASK_ID
+    MODEL_NAME, MODEL_SCRIPT, CODE_DIR, REGION, MODEL_PATH, SM_ROLE, TRAIN_TASK_ID
 ):
 
     train_return = (

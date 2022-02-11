@@ -1,4 +1,4 @@
-iapiVersion: "serving.kserve.io/v1beta1"
+apiVersion: "serving.kserve.io/v1beta1"
 kind: "InferenceService"
 metadata:
   name: "klarna-case-credit-model"

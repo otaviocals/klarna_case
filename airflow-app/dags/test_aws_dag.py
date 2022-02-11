@@ -15,64 +15,59 @@ import boto3
 def generate_sagemaker_train_config(
     MODEL_NAME, BUCKET_NAME, SM_ROLE, TRAIN_SCRIPT, REGION, QUERY_DATA_TASK_ID
 ):
-    return (
-        {
-            "AlgorithmSpecification": {
-                "TrainingImage": "683313688378.dkr.ecr.us-east-1.amazonaws.com/sagemaker-scikit-learn:0.23-1-cpu-py3",
-                "TrainingInputMode": "File",
-            },
-            "OutputDataConfig": {
-                "S3OutputPath": "s3://"
-                + BUCKET_NAME
-                + "/"
-                + MODEL_NAME
-                + "/train/output-data/{{ ds_nodash }}"
-            },
-            "StoppingCondition": {"MaxRuntimeInSeconds": 86400},
-            "ResourceConfig": {
-                "InstanceCount": 1,
-                "InstanceType": "ml.c4.xlarge",
-                "VolumeSizeInGB": 30,
-            },
-            "RoleArn": "" + SM_ROLE,
-            "InputDataConfig": [
-                {
-                    "DataSource": {
-                        "S3DataSource": {
-                            "S3DataType": "S3Prefix",
-                            "S3Uri": "s3://"
-                            + BUCKET_NAME
-                            + "/"
-                            + MODEL_NAME
-                            + "/train/raw-train-data/{{ ds_nodash }}/{{ ti.xcom_pull(task_ids='"
-                            + QUERY_DATA_TASK_ID
-                            + "', key='return_value') }}.csv",
-                            "S3DataDistributionType": "FullyReplicated",
-                        }
-                    },
-                    "ChannelName": "training",
-                }
-            ],
-            "HyperParameters": {
-                "sagemaker_submit_directory": '"s3://'
-                + BUCKET_NAME
-                + "/"
-                + MODEL_NAME
-                + "/code/"
-                + MODEL_NAME
-                + '-1.0.tar.gz"',
-                "sagemaker_program": MODEL_NAME
-                + "-1.0/"
-                + MODEL_NAME
-                + "/"
-                + TRAIN_SCRIPT,
-                "sagemaker_container_log_level": "20",
-                "sagemaker_job_name": MODEL_NAME + "-{{ ts_nodash }}",
-                "sagemaker_region": REGION,
-            },
-            "TrainingJobName": MODEL_NAME + "-{{ ts_nodash }}",
+    config = {
+        "AlgorithmSpecification": {
+            "TrainingImage": "683313688378.dkr.ecr.us-east-1.amazonaws.com/sagemaker-scikit-learn:0.23-1-cpu-py3",
+            "TrainingInputMode": "File",
         },
-    )
+        "OutputDataConfig": {
+            "S3OutputPath": "s3://"
+            + BUCKET_NAME
+            + "/"
+            + MODEL_NAME
+            + "/train/output-data/{{ ds_nodash }}"
+        },
+        "StoppingCondition": {"MaxRuntimeInSeconds": 86400},
+        "ResourceConfig": {
+            "InstanceCount": 1,
+            "InstanceType": "ml.c4.xlarge",
+            "VolumeSizeInGB": 30,
+        },
+        "RoleArn": "" + SM_ROLE,
+        "InputDataConfig": [
+            {
+                "DataSource": {
+                    "S3DataSource": {
+                        "S3DataType": "S3Prefix",
+                        "S3Uri": "s3://"
+                        + BUCKET_NAME
+                        + "/"
+                        + MODEL_NAME
+                        + "/train/raw-train-data/{{ ds_nodash }}/{{ ti.xcom_pull(task_ids='"
+                        + QUERY_DATA_TASK_ID
+                        + "', key='return_value') }}.csv",
+                        "S3DataDistributionType": "FullyReplicated",
+                    }
+                },
+                "ChannelName": "training",
+            }
+        ],
+        "HyperParameters": {
+            "sagemaker_submit_directory": '"s3://'
+            + BUCKET_NAME
+            + "/"
+            + MODEL_NAME
+            + "/code/"
+            + MODEL_NAME
+            + '-1.0.tar.gz"',
+            "sagemaker_program": MODEL_NAME + "-1.0/" + MODEL_NAME + "/" + TRAIN_SCRIPT,
+            "sagemaker_container_log_level": "20",
+            "sagemaker_job_name": MODEL_NAME + "-{{ ts_nodash }}",
+            "sagemaker_region": REGION,
+        },
+        "TrainingJobName": MODEL_NAME + "-{{ ts_nodash }}",
+    }
+    return config
 
 
 args = {

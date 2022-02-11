@@ -7,7 +7,6 @@ import json
 import pandas as pd
 import joblib
 from sklearn import svm
-from sklearn.externals import joblib
 import logging
 from sklearn.pipeline import Pipeline
 from sklearn.utils import parallel_backend

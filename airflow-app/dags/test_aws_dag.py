@@ -11,37 +11,12 @@ from airflow.contrib.operators.sagemaker_training_operator import (
 
 import boto3
 
-args = {
-    "owner": "airflow",
-}
 
-with DAG(
-    dag_id="test_dag_aws",
-    default_args=args,
-    schedule_interval="0 0 * * *",
-    start_date=days_ago(2),
-    dagrun_timeout=timedelta(minutes=60),
-    tags=["example", "example2"],
-    params={"example_key": "example_value"},
-) as dag:
-
-    test_athena_operator = AWSAthenaOperator(
-        task_id=f"run_query_test",
-        query="select * from credit_train_data where has_paid=TRUE",
-        output_location="s3://klarna-case-model-bucket/credit-model/train/raw-train-data/{{ ds_nodash }}",
-        database="klarna_case",
-    )
-
-    MODEL_NAME = "credit-model"
-    BUCKET_NAME = "klarna-case-model-bucket"
-    SM_ROLE = "klarna-case-sm-role"
-    TRAIN_SCRIPT = "test.py"
-    REGION = "us-east-1"
-    QUERY_DATA_TASK_ID = "run_query_test"
-
-    train_op = SageMakerTrainingOperator(
-        task_id="test_training",
-        config={
+def generate_sagemaker_train_config(
+    MODEL_NAME, BUCKET_NAME, SM_ROLE, TRAIN_SCRIPT, REGION, QUERY_DATA_TASK_ID
+):
+    return (
+        {
             "AlgorithmSpecification": {
                 "TrainingImage": "683313688378.dkr.ecr.us-east-1.amazonaws.com/sagemaker-scikit-learn:0.23-1-cpu-py3",
                 "TrainingInputMode": "File",
@@ -97,6 +72,47 @@ with DAG(
             },
             "TrainingJobName": MODEL_NAME + "-{{ ts_nodash }}",
         },
+    )
+
+
+args = {
+    "owner": "airflow",
+}
+
+with DAG(
+    dag_id="test_dag_aws",
+    default_args=args,
+    schedule_interval="0 0 * * *",
+    start_date=days_ago(2),
+    dagrun_timeout=timedelta(minutes=60),
+    tags=["example", "example2"],
+    params={"example_key": "example_value"},
+) as dag:
+
+    test_athena_operator = AWSAthenaOperator(
+        task_id=f"run_query_test",
+        query="select * from credit_train_data where has_paid=TRUE",
+        output_location="s3://klarna-case-model-bucket/credit-model/train/raw-train-data/{{ ds_nodash }}",
+        database="klarna_case",
+    )
+
+    # MODEL_NAME = "credit-model"
+    # BUCKET_NAME = "klarna-case-model-bucket"
+    # SM_ROLE = "klarna-case-sm-role"
+    # TRAIN_SCRIPT = "test.py"
+    # REGION = "us-east-1"
+    # QUERY_DATA_TASK_ID = "run_query_test"
+
+    train_op = SageMakerTrainingOperator(
+        task_id="test_training",
+        config=generate_sagemaker_train_config(
+            "credit-model",
+            "klarna-case-model-bucket",
+            "klarna-case-sm-role",
+            "train.py",
+            "us-east-1",
+            "run_query_test",
+        ),
         wait_for_completion=True,
         dag=dag,
     )

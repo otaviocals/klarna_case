@@ -1,5 +1,5 @@
 from datetime import timedelta
-
+import json
 from airflow import DAG
 from airflow.operators.bash import BashOperator
 from airflow.operators.dummy import DummyOperator
@@ -74,7 +74,7 @@ def generate_sagemaker_model_config(
     MODEL_NAME, MODEL_SCRIPT, CODE_DIR, REGION, MODEL_PATHi, SM_ROLE, TRAIN_TASK_ID
 ):
 
-    train_return = (
+    train_return = json.loads(
         "{{ ti.xcom_pull(task_ids='" + TRAIN_TASK_ID + "', key='return_value') }}"
     )
     print(train_return)

@@ -47,7 +47,7 @@ with DAG(
                 "TrainingInputMode": "File",
             },
             "OutputDataConfig": {
-                "S3OutputPath": "s3://{{ BUCKET_NAME }}/{{ MODEL_NAME }}/train/output-data/{{ ds_nodash }}"
+                "S3OutputPath": "s3://{{ var.value.BUCKET_NAME }}/{{ MODEL_NAME }}/train/output-data/{{ ds_nodash }}"
             },
             "StoppingCondition": {"MaxRuntimeInSeconds": 86400},
             "ResourceConfig": {

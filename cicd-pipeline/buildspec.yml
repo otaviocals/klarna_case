@@ -37,7 +37,7 @@ phases:
       - echo Deploying Credit Model
       - cd models/credit-model
       - python3 setup.py sdist
-      - aws s3 sync dist/credit-model-1.0.tar.gz s3://klarna-case-model-bucket/credit-model/code/credit-model-1.0.tar.gz 
+      - aws s3 sync dist s3://klarna-case-model-bucket/credit-model/code
       - cd ../..
     finally:
       - echo This always runs even if the install command fails

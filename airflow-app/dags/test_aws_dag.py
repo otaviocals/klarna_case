@@ -7,6 +7,7 @@ from airflow.utils.dates import days_ago
 from airflow.providers.amazon.aws.operators.athena import AWSAthenaOperator
 from airflow.contrib.operators.sagemaker_training_operator import (
     SageMakerTrainingOperator,
+    SageMakerModelOperator,
 )
 
 import boto3
@@ -70,6 +71,34 @@ def generate_sagemaker_train_config(
     return config
 
 
+def generate_sagemaker_model_config(
+    MODEL_NAME, MODEL_SCRIPT, CODE_DIR, REGION, MODEL_PATHi, SM_ROLE, TRAIN_TASK_ID
+):
+
+    train_return = (
+        "{{ ti.xcom_pull(task_ids='" + TRAIN_TASK_ID + "', key='return_value') }}"
+    )
+    print(train_return)
+    config = {
+        "ModelName": MODEL_NAME,
+        "PrimaryContainer": {
+            "Image": "683313688378.dkr.ecr.us-east-1.amazonaws.com/sagemaker-scikit-learn:0.23-1-cpu-py3",
+            "Environment": {
+                "SAGEMAKER_PROGRAM": MODEL_SCRIPT,
+                "SAGEMAKER_SUBMIT_DIRECTORY": train_return["Training"][
+                    "HyperParameters"
+                ]["sagemaker_submit_directory"],
+                "SAGEMAKER_CONTAINER_LOG_LEVEL": "20",
+                "SAGEMAKER_REGION": REGION,
+            },
+            "ModelDataUrl": MODEL_PATH,
+        },
+        "ExecutionRoleArn": "" + SM_ROLE,
+    }
+
+    return config
+
+
 args = {
     "owner": "airflow",
 }
@@ -109,6 +138,20 @@ with DAG(
             "run_query_test",
         ),
         wait_for_completion=True,
+        dag=dag,
+    )
+
+    create_model = SageMakerModelOperator(
+        task_id="create_new_model",
+        config=generate_sagemaker_model_config(
+            "credit-model",
+            "train.py",
+            "",  ###################### FIX
+            "us-east-1",
+            "",  ############################FIX
+            "klarna-case-sm-role",
+            "test_training",
+        ),
         dag=dag,
     )
 

@@ -69,7 +69,9 @@ with DAG(
                             + BUCKET_NAME
                             + "/"
                             + MODEL_NAME
-                            + "/train/raw-train-data/{{ ds_nodash }}/{{ ti.xcom_pull(task_ids='run_query_test', key='return_value') }}.csv",
+                            + "/train/raw-train-data/{{ ds_nodash }}/{{ ti.xcom_pull(task_ids='"
+                            + QUERY_DATA_TASK_ID
+                            + "', key='return_value') }}.csv",
                             "S3DataDistributionType": "FullyReplicated",
                         }
                     },

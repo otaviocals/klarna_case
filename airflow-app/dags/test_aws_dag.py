@@ -7,9 +7,8 @@ from airflow.utils.dates import days_ago
 from airflow.providers.amazon.aws.operators.athena import AWSAthenaOperator
 from airflow.contrib.operators.sagemaker_training_operator import (
     SageMakerTrainingOperator,
-    SageMakerModelOperator,
 )
-
+from airflow.contrib.operators.sagemaker_model_operator import SageMakerModelOperator
 import boto3
 
 

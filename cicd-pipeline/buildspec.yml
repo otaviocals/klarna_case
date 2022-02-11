@@ -12,6 +12,7 @@ phases:
       - apt-get update -y
       - apt-get install -y python3
       - python3 -m pip install black
+      - curl -sSL "https://github.com/buildpacks/pack/releases/download/v0.23.0/pack-v0.23.0-linux.tgz" | tar -C /usr/local/bin/ --no-same-owner -xzv pack
     finally:
       - echo This always runs even if the update or install command fails 
   pre_build:
@@ -38,6 +39,8 @@ phases:
       - cd models/credit-model
       - python3 setup.py sdist
       - aws s3 sync dist s3://klarna-case-model-bucket/credit-model/code
+      - pack build --builder=heroku/buildpacks:20 025105345127.dkr.ecr.us-east-1.amazonaws.com/klarna-case
+      - docker push 025105345127.dkr.ecr.us-east-1.amazonaws.com/klarna-case
       - cd ../..
     finally:
       - echo This always runs even if the install command fails

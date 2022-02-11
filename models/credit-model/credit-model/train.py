@@ -6,10 +6,13 @@ import sys
 import json
 import pandas as pd
 import joblib
+import re
 from sklearn import svm
 import logging
 from sklearn.pipeline import Pipeline
 from sklearn.utils import parallel_backend
+from sklearn.svm import SVC
+from sklearn.preprocessing import StandardScaler
 import warnings
 
 warnings.simplefilter(action="ignore", category=FutureWarning)
@@ -18,11 +21,13 @@ warnings.simplefilter(action="ignore", category=FutureWarning)
 def train():
 
     # Load data
-    print(os.listdir(".."))
-    print(os.listdir("../input/data/training"))
+    input_files = os.listdir("../input/data/training")
+
+    p = re.compile("\.csv$")
+    input_file = [s for s in input_files if p.match(s)]
 
     # Create model operators pipeline
-    pipe = Pipeline(steps=[])
+    pipe = Pipeline([("scaler", StandardScaler()), ("svc", SVC())])
 
     # Set pipeline initial parameters
     params = {}
@@ -37,7 +42,7 @@ def train():
     #    pipe.fit(data)
 
     # Dump trained model
-    joblib.dump(pipe, "model/model.joblib", compress=2)
+    joblib.dump(pipe, "../model/model.joblib", compress=2)
 
     # Dump model metrics
     # metrics = pipe.get_params()["model__metrics"]

@@ -55,7 +55,7 @@ with DAG(
         task_id="create_new_model",
         config=generate_sagemaker_model_config(
             "credit-model",
-            "train.py",
+            "credit-model.train",
             "test_training",
         ),
         dag=dag,

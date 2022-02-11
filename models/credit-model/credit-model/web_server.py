@@ -5,15 +5,21 @@ import joblib
 import pandas as pd
 import subprocess
 import sys
+import os
 import warnings
 import logging
 
 warnings.simplefilter(action="ignore", category=FutureWarning)
 
+AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID").strip("\n")
+AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY").strip("\n")
+
 
 def download_data_webserver(bucket, source_filename, filename):
     s3 = boto3.client(
         "s3",
+        aws_access_key_id=AWS_ACCESS_KEY_ID,
+        aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
     )
     s3.download_file(bucket, source_filename, filename)
     logging.info("Downloaded data.")

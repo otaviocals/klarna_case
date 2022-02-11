@@ -1,0 +1,20 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: klarna-case-credit-model-ingress
+  namespace: kserve-models
+  annotations:
+    kubernetes.io/ingress.class: nginx
+spec:
+  rules:
+  - host: 
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/v2/models/credit-model/infer"
+        backend:
+          service:
+            name: klarna-case-credit-model-predictor-default-00001-private
+            port:
+              number: 8012
+

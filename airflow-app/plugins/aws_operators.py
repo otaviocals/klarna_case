@@ -1,23 +1,63 @@
 from airflow.models import BaseOperator
 from airflow.utils.decorators import apply_defaults
 from datetime import datetime
-from tempfile import NamedTemporaryFile
+from tempfile import NamedTemporaryFilei, TemporaryDirectory
+import boto3
+import tarfile
 
 
 class DeployModelOperator(BaseOperator):
-    template_fields = "model_location"
+    template_fields = (
+        "model_location",
+        "new_version_location",
+        "master_model_resource_path",
+    )
 
     template_ext = ()
 
     ui_color = "#e4e6f0"
 
     @apply_defaults
-    def __init__(self, model_location=None, *args, **kwargs):
+    def __init__(
+        self,
+        model_bucket,
+        model_location,
+        new_version_location,
+        model_filename="model.joblib",
+        restart_model_webserver=False,
+        master_internal_ip=None,
+        master_model_resource_path=None,
+        *args,
+        **kwargs
+    ):
+        self.model_bucket = model_bucket
         self.model_location = model_location
+        self.new_version_location = new_version_location
+        self.model_filename = model_filename
+        self.restart_model_webserver = restart_model_webserver
+        self.master_internal_ip = master_internal_ip
+        self.master_model_resource_path = master_model_resouce_path
 
     def execute(self, context):
 
-        self.log.info(self.model_location)
+        with NamedTemporaryFile() as tmp:
+            s3 = boto3.client("s3")
+            s3.download_file(self.model_bucket, self.new_version_location, tmp.name)
+
+            with TemporaryDirectory() as tmp_dir:
+                tarfile.open(tmp.name, mode="r:gz").extractall(tmp_dir)
+                s3.upload_file(
+                    tmp_dir + "/" + self.model_filename,
+                    self.model_bucket,
+                    self.model_location,
+                )
+
+        self.log.info("New version deployed")
+
+        if self.restart_model_webserver:
+
+            self.log.info("Restarting webserver")
+            self.log.info("Webserver restarted")
 
         return
 

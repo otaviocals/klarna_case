@@ -78,7 +78,7 @@ def generate_sagemaker_model_config(
         "{{ ti.xcom_pull(task_ids='" + TRAIN_TASK_ID + "', key='return_value') }}"
     )
     print(train_return)
-    train_return_dict = yaml.load(train_return)
+    # train_return_dict = yaml.load(train_return)
     config = {
         "ModelName": MODEL_NAME,
         "PrimaryContainer": {

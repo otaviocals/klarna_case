@@ -79,21 +79,45 @@ def generate_sagemaker_model_config(
         + TRAIN_TASK_ID
         + "', key='return_value')['Training']['HyperParameters']['sagemaker_submit_directory'].strip('\\\"') }}"
     )
+
+    region = (
+        "{{ ti.xcom_pull(task_ids='"
+        + TRAIN_TASK_ID
+        + "', key='return_value')['Training']['HyperParameters']['sagemaker_region'].strip('\\\"') }}"
+    )
+
+    program = (
+        "{{ ti.xcom_pull(task_ids='"
+        + TRAIN_TASK_ID
+        + "', key='return_value')['Training']['HyperParameters']['sagemaker_program'].strip('\\\"') }}"
+    )
+
+    model_path = (
+        "{{ ti.xcom_pull(task_ids='"
+        + TRAIN_TASK_ID
+        + "', key='return_value')['Training']['ModelArtifacts']['S3ModelArtifacts'].strip('\\\"') }}"
+    )
+
+    sm_role = (
+        "{{ ti.xcom_pull(task_ids='"
+        + TRAIN_TASK_ID
+        + "', key='return_value')['Training']['RoleArn'].strip('\\\"') }}"
+    )
+
     print(sub_dir)
-    # train_return_dict = yaml.load(train_return)
     config = {
         "ModelName": MODEL_NAME,
         "PrimaryContainer": {
             "Image": "683313688378.dkr.ecr.us-east-1.amazonaws.com/sagemaker-scikit-learn:0.23-1-cpu-py3",
             "Environment": {
-                "SAGEMAKER_PROGRAM": MODEL_SCRIPT,
+                "SAGEMAKER_PROGRAM": program,
                 "SAGEMAKER_SUBMIT_DIRECTORY": sub_dir,
                 "SAGEMAKER_CONTAINER_LOG_LEVEL": "20",
-                "SAGEMAKER_REGION": REGION,
+                "SAGEMAKER_REGION": region,
             },
-            "ModelDataUrl": MODEL_PATH,
+            "ModelDataUrl": model_path,
         },
-        "ExecutionRoleArn": "" + SM_ROLE,
+        "ExecutionRoleArn": sm_role,
     }
 
     return config

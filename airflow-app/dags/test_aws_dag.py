@@ -156,7 +156,7 @@ with DAG(
     )
 
 
-test_athena_operator >> train_op
+test_athena_operator >> train_op >> create_model
 
 if __name__ == "__main__":
     dag.cli()

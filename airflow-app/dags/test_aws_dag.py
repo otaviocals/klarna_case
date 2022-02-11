@@ -9,7 +9,7 @@ from airflow.contrib.operators.sagemaker_training_operator import (
     SageMakerTrainingOperator,
 )
 from airflow.contrib.operators.sagemaker_model_operator import SageMakerModelOperator
-from aws_utils import (
+from aws_operators import (
     DeployModelOperator,
     generate_sagemaker_train_config,
     generate_sagemaker_model_config,

@@ -74,19 +74,20 @@ def generate_sagemaker_model_config(
     MODEL_NAME, MODEL_SCRIPT, CODE_DIR, REGION, MODEL_PATHi, SM_ROLE, TRAIN_TASK_ID
 ):
 
-    train_return = yaml.load(
+    train_return = (
         "{{ ti.xcom_pull(task_ids='" + TRAIN_TASK_ID + "', key='return_value') }}"
     )
     print(train_return)
+    train_return_dict = yaml.load(train_return)
     config = {
         "ModelName": MODEL_NAME,
         "PrimaryContainer": {
             "Image": "683313688378.dkr.ecr.us-east-1.amazonaws.com/sagemaker-scikit-learn:0.23-1-cpu-py3",
             "Environment": {
                 "SAGEMAKER_PROGRAM": MODEL_SCRIPT,
-                "SAGEMAKER_SUBMIT_DIRECTORY": train_return["Training"][
-                    "HyperParameters"
-                ]["sagemaker_submit_directory"],
+                # "SAGEMAKER_SUBMIT_DIRECTORY": train_returni_dict["Training"][
+                #    "HyperParameters"
+                # ]["sagemaker_submit_directory"],
                 "SAGEMAKER_CONTAINER_LOG_LEVEL": "20",
                 "SAGEMAKER_REGION": REGION,
             },

@@ -17,8 +17,12 @@ warnings.simplefilter(action="ignore", category=FutureWarning)
 
 def train():
 
+    # Load data
+    print(os.listdir(os.curdir))
+    print(os.listdir("input/data/training"))
+
     # Create model operators pipeline
-    pipe = Pipeline()
+    pipe = Pipeline(steps=[])
 
     # Set pipeline initial parameters
     params = {}

@@ -23,7 +23,7 @@ def train():
     input_files = os.listdir("../input/data/training")
 
     p = re.compile("\.csv$")
-    input_file = [s for s in input_files if p.match(s)]
+    input_file = [s for s in input_files if p.match(s)][0]
 
     logging.info(input_files)
     logging.info(input_file)

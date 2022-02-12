@@ -373,53 +373,58 @@ class Model(BaseEstimator, RegressorMixin):
         self.model = model
         self.metrics = metrics
 
-    def cutoff_analysis(y_test, test_predictions_proba):
+    def fit(self, X=None, y=None):
+        def cutoff_analysis(y_test, test_predictions_proba):
 
-        metrics = pd.DataFrame(
-            columns=[
-                "cutoff",
-                "vol_1",
-                "vol_0",
-                "roc_auc",
-                "recall",
-                "precision",
-                "f1",
-                "balanced_accuracy",
-            ]
-        )
-
-        for i in range(0, 100):
-
-            predictions_cutoff = i / 100
-
-            test_predictions_proba_cut = test_predictions_proba.copy()
-            test_predictions_proba_cut.loc[
-                test_predictions_proba_cut >= predictions_cutoff
-            ] = 1
-            test_predictions_proba_cut.loc[
-                test_predictions_proba_cut < predictions_cutoff
-            ] = 0
-
-            metric = pd.DataFrame(
-                {
-                    "cutoff": [predictions_cutoff],
-                    "vol_1": [len(test_predictions_cut.loc[test_predictions_cut == 1])],
-                    "vol_0": [len(test_predictions_cut.loc[test_predictions_cut == 0])],
-                    "roc_auc": [roc_auc_score(y_test, test_predictions_proba_cut)],
-                    "recall": [recall_score(y_test, test_predictions_proba_cut)],
-                    "precision": [precision_score(y_test, test_predictions_proba_cut)],
-                    "f1": [f1_score(y_test, test_predictions_proba_cut)],
-                    "balanced_accuracy": [
-                        balanced_accuracy_score(y_test, test_predictions_proba_cut)
-                    ],
-                }
+            metrics = pd.DataFrame(
+                columns=[
+                    "cutoff",
+                    "vol_1",
+                    "vol_0",
+                    "roc_auc",
+                    "recall",
+                    "precision",
+                    "f1",
+                    "balanced_accuracy",
+                ]
             )
 
-            metrics = metrics.append(metric)
+            for i in range(0, 100):
 
-        return metrics
+                predictions_cutoff = i / 100
 
-    def fit(self, X=None, y=None):
+                test_predictions_proba_cut = test_predictions_proba.copy()
+                test_predictions_proba_cut.loc[
+                    test_predictions_proba_cut >= predictions_cutoff
+                ] = 1
+                test_predictions_proba_cut.loc[
+                    test_predictions_proba_cut < predictions_cutoff
+                ] = 0
+
+                metric = pd.DataFrame(
+                    {
+                        "cutoff": [predictions_cutoff],
+                        "vol_1": [
+                            len(test_predictions_cut.loc[test_predictions_cut == 1])
+                        ],
+                        "vol_0": [
+                            len(test_predictions_cut.loc[test_predictions_cut == 0])
+                        ],
+                        "roc_auc": [roc_auc_score(y_test, test_predictions_proba_cut)],
+                        "recall": [recall_score(y_test, test_predictions_proba_cut)],
+                        "precision": [
+                            precision_score(y_test, test_predictions_proba_cut)
+                        ],
+                        "f1": [f1_score(y_test, test_predictions_proba_cut)],
+                        "balanced_accuracy": [
+                            balanced_accuracy_score(y_test, test_predictions_proba_cut)
+                        ],
+                    }
+                )
+
+                metrics = metrics.append(metric)
+
+            return metrics
 
         print("Training model")
 

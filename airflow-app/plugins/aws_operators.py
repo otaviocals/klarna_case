@@ -1,5 +1,6 @@
 from airflow.models import BaseOperator
 from airflow.utils.decorators import apply_defaults
+from airflow.hooks.base import BaseHook
 from datetime import datetime
 from tempfile import NamedTemporaryFile, TemporaryDirectory
 import boto3
@@ -27,6 +28,8 @@ class DeployModelOperator(BaseOperator):
         restart_model_webserver=False,
         master_internal_ip=None,
         master_model_resource_path=None,
+        aws_conn_id="aws_default",
+        aws_region="us-east-1",
         *args,
         **kwargs
     ):
@@ -38,11 +41,20 @@ class DeployModelOperator(BaseOperator):
         self.restart_model_webserver = restart_model_webserver
         self.master_internal_ip = master_internal_ip
         self.master_model_resource_path = master_model_resource_path
+        self.aws_conn_id = aws_conn_id
+        self.aws_region = aws_region
 
     def execute(self, context):
 
+        aws_connection = BaseHook.get_connection(self.aws_conn_id)
+
         with NamedTemporaryFile() as tmp:
-            s3 = boto3.client("s3")
+            s3 = boto3.client(
+                "s3",
+                aws_access_key_id=aws_connection.login,
+                aws_secret_access_key=aws_connection.password,
+                region_name=self.aws_region,
+            )
             s3.download_file(self.model_bucket, self.new_version_location, tmp.name)
 
             with TemporaryDirectory() as tmp_dir:

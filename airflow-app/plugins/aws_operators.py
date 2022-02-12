@@ -74,16 +74,26 @@ class DeployModelOperator(BaseOperator):
 
             self.log.info("Restarting webserver")
 
-            subprocess.Popen(
-                "ssh {user}@{host} kubectl replace --force -f {config_path}".format(
-                    user=self.master_user,
-                    host=self.master_internal_ip,
-                    config_path=self.master_model_resource_path,
-                ),
+            subproc = subprocess.Popen(
+                [
+                    "ssh",
+                    "{user}@{host}".format(
+                        user=self.master_user,
+                        host=self.master_internal_ip,
+                    ),
+                ],
                 shell=True,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
-            ).communicate()
+            )
+            out, err = subproc.communicate(
+                "kubectl replace --force -f {config_path}".format(
+                    config_path=self.master_model_resource_path,
+                )
+            )
+
+            self.log.info(out)
+            self.log.info(err)
 
             self.log.info("Webserver restarted")
 

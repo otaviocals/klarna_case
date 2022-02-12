@@ -1,4 +1,3 @@
-import logging
 import pandas as pd
 import numpy as np
 import math
@@ -36,7 +35,7 @@ class PreProc(BaseEstimator, TransformerMixin):
         categoricals = []
         geos = []
 
-        logging.info("Preprocessing data")
+        print("Preprocessing data")
 
         # Train Pre-proc
         if not self.fitted:
@@ -115,7 +114,7 @@ class PreProc(BaseEstimator, TransformerMixin):
 
                 # Batch prediction (no target)
                 if len(X.columns) == 17:
-                    logging.info("Batch prediction")
+                    print("Batch prediction")
                     X.columns = [
                         "order_lat",
                         "order_lng",
@@ -137,7 +136,7 @@ class PreProc(BaseEstimator, TransformerMixin):
                     ]
                 # Validation prediction (with target)
                 elif len(X.columns) == 18:
-                    logging.info("Validation prediction")
+                    print("Validation prediction")
                     X.columns = [
                         "order_lat",
                         "order_lng",
@@ -189,7 +188,7 @@ class PreProc(BaseEstimator, TransformerMixin):
             # Fill missing data
             X = X.fillna(0)
 
-        logging.info("Preprocessing finished")
+        print("Preprocessing finished")
 
         return X
 
@@ -208,10 +207,10 @@ class Split(BaseEstimator, TransformerMixin):
 
         if not self.fitted:
 
-            logging.info("Spliting data")
+            print("Spliting data")
 
             # Split target and features
-            y = X[self.target_feature]
+            y = X[self.target_column]
             X = X.drop([self.target_column], axis=1)
 
             # Split train/test target and features
@@ -224,7 +223,7 @@ class Split(BaseEstimator, TransformerMixin):
 
             self.set_params(**params)
 
-            logging.info("Spliting finished")
+            print("Spliting finished")
 
             return (X_train, X_test, y_train, y_test)
 
@@ -248,7 +247,7 @@ class FeatSelect(BaseEstimator, TransformerMixin):
         # Train - Select best features
         if not self.fitted:
 
-            logging.info("Selecting features")
+            print("Selecting features")
 
             X_train, X_test, y_train, y_test = X
 
@@ -264,8 +263,8 @@ class FeatSelect(BaseEstimator, TransformerMixin):
                 ascending=False
             )
 
-            logging.info("Unfiltered Features")
-            logging.info(rank)
+            print("Unfiltered Features")
+            print(rank)
 
             # Select Features (drop 'drop_features' less relevant features)
             select_features = rank.abs().sort_values(ascending=False).index
@@ -273,8 +272,8 @@ class FeatSelect(BaseEstimator, TransformerMixin):
                 select_features[0 : len(select_features) - self.drop_features]
             )
 
-            logging.info("Selected Features")
-            logging.info(select_features)
+            print("Selected Features")
+            print(select_features)
 
             # Filter selected features
             X_train = X_train[select_features]
@@ -285,7 +284,7 @@ class FeatSelect(BaseEstimator, TransformerMixin):
 
             self.set_params(**params)
 
-            logging.info("Selecting finished")
+            print("Selecting finished")
 
             return (X_train, X_test, y_train, y_test)
         # Predict - Filter best features
@@ -297,7 +296,7 @@ class FeatSelect(BaseEstimator, TransformerMixin):
             # Filter selected features
             X = X[features]
 
-            logging.info("Filtering features")
+            print("Filtering features")
 
             return X
 
@@ -311,7 +310,7 @@ class Model(BaseEstimator, RegressorMixin):
 
     def fit(self, X=None, y=None):
 
-        logging.info("Training model")
+        print("Training model")
 
         X_train, X_test, y_train, y_test = X
 
@@ -439,12 +438,12 @@ class Model(BaseEstimator, RegressorMixin):
         grid_regressor.fit(X_train, y_train)
 
         # Log hyperparameter tuning metrics
-        logging.info("CV Results:")
-        logging.info(grid_regressor.cv_results_)
-        logging.info("Best Metrics:")
-        logging.info(grid_regressor.best_score_)
-        logging.info("Best Params:")
-        logging.info(grid_regressor.best_params_)
+        print("CV Results:")
+        print(grid_regressor.cv_results_)
+        print("Best Metrics:")
+        print(grid_regressor.best_score_)
+        print("Best Params:")
+        print(grid_regressor.best_params_)
 
         # Get best model
         regressor = grid_regressor.best_estimator_
@@ -461,20 +460,20 @@ class Model(BaseEstimator, RegressorMixin):
             }
         )
 
-        logging.info(metrics)
+        print(metrics)
 
         # Set params for predict
         params = {"model": regressor, "metrics": metrics, "fitted": True}
 
         self.set_params(**params)
 
-        logging.info("Training finished")
+        print("Training finished")
 
         return self
 
     def predict(self, X):
 
-        logging.info("Predicting data")
+        print("Predicting data")
 
         # Load model
         regressor = self.model
@@ -485,7 +484,7 @@ class Model(BaseEstimator, RegressorMixin):
         # Merge Predictions to features
         X = X.merge(predictions, left_index=True, right_index=True)
 
-        logging.info("Predicting finished")
+        print("Predicting finished")
 
         # Return predictions
         return X["predictions"].to_numpy()

@@ -6,5 +6,6 @@ setup(
     description="Klarna Credit Model",
     author="Otavio Cals",
     packages=["credit_model"],
+    include_package_data=True,
     install_requires=["catboost", "kserve", "xgboost"],
 )

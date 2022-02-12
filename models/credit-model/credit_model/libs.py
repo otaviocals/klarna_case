@@ -405,10 +405,18 @@ class Model(BaseEstimator, RegressorMixin):
                     {
                         "cutoff": [predictions_cutoff],
                         "vol_1": [
-                            len(test_predictions_cut.loc[test_predictions_cut == 1])
+                            len(
+                                test_predictions_proba_cut.loc[
+                                    test_predictions_proba_cut == 1
+                                ]
+                            )
                         ],
                         "vol_0": [
-                            len(test_predictions_cut.loc[test_predictions_cut == 0])
+                            len(
+                                test_predictions_proba_cut.loc[
+                                    test_predictions_proba_cut == 0
+                                ]
+                            )
                         ],
                         "roc_auc": [roc_auc_score(y_test, test_predictions_proba_cut)],
                         "recall": [recall_score(y_test, test_predictions_proba_cut)],

@@ -12,7 +12,6 @@ class DeployModelOperator(BaseOperator):
     template_fields = (
         "model_location",
         "new_version_location",
-        "master_model_resource_path",
     )
 
     template_ext = ()

@@ -42,7 +42,7 @@ class PreProc(BaseEstimator, TransformerMixin):
         if not self.fitted:
 
             # Drop unused Features
-            X = X.drop(["promised_time"], axis=1)
+            # X = X.drop(["promised_time"], axis=1)
 
             encoders = {}
             geo_encoders = {}

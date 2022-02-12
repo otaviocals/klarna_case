@@ -105,6 +105,7 @@ def generate_sagemaker_train_config(
             }
         ],
         "HyperParameters": {
+            "sagemaker_requirements": "requirements.txt",
             "sagemaker_submit_directory": '"s3://'
             + BUCKET_NAME
             + "/"

@@ -18,7 +18,7 @@ from catboost import CatBoostRegressor
 
 # Pre-processing Operator
 class PreProc(BaseEstimator, TransformerMixin):
-    def __init__(self, target_column, fitted=False, encoders={}, geo_encoders={}):
+    def __init__(self, target_column="", fitted=False, encoders={}, geo_encoders={}):
         self.target_column = target_column
         self.fitted = fitted
         self.encoders = encoders
@@ -196,7 +196,7 @@ class PreProc(BaseEstimator, TransformerMixin):
 
 # Train-test split Operator
 class Split(BaseEstimator, TransformerMixin):
-    def __init__(self, target_column, split_size=0.7, fitted=False):
+    def __init__(self, target_column="", split_size=0.7, fitted=False):
         self.target_column = target_column
         self.split_size = split_size
         self.fitted = fitted

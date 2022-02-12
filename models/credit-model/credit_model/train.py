@@ -55,7 +55,7 @@ def train():
     pipe.set_params(**params)
 
     # Get train data
-    data = pd.read_csv(input_file)
+    data = pd.read_csv("../input/data/training/" + input_file)
 
     # Train model
     with parallel_backend("threading"):

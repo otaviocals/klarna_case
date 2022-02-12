@@ -584,7 +584,7 @@ class Model(BaseEstimator, RegressorMixin):
             metrics.sort_values(by="f1", ascending=False).head(1)["cutoff"]
         )
         print(metrics)
-        print("Best cutoff: " + best_cutoff)
+        print("Best cutoff: " + str(best_cutoff))
 
         # Set params for predict
         params = {

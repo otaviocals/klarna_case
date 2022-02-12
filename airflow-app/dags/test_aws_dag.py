@@ -55,7 +55,7 @@ with DAG(
         task_id="deploy_model",
         model_bucket="klarna-case-model-bucket",
         model_location="credit-model/model/model.joblib",
-        new_version_location="{{ ti.xcom_pull(task_ids='test_training', key='return_value')['Training']['ModelArtifacts']['S3ModelArtifacts'].replace('\\\"','').replace('s3:////klarna-case-model-bucket//','') }}",
+        new_version_location="credit-model/train/output-data/20220208/{{ ti.xcom_pull(task_ids='test_training', key='return_value')['Training']['TrainingJobName'] }}/output/model.tar.gz",
         model_filename="model.joblib",
         restart_model_webserver=False,
         master_internal_ip=None,

@@ -11,8 +11,7 @@ from sklearn import svm
 import logging
 from sklearn.pipeline import Pipeline
 from sklearn.utils import parallel_backend
-from sklearn.svm import SVC
-from sklearn.preprocessing import StandardScaler
+from credit_model.libs import PreProc, Split, FeatSelect, Model
 import warnings
 
 warnings.simplefilter(action="ignore", category=FutureWarning)
@@ -25,30 +24,46 @@ def train():
 
     p = re.compile("\.csv$")
     input_file = [s for s in input_files if p.match(s)]
-    print(input_file)
+    logging.info(input_file)
 
     # Create model operators pipeline
-    pipe = Pipeline([("scaler", StandardScaler()), ("svc", SVC())])
+    pipe = Pipeline(
+        [
+            ("preproc", PreProc()),
+            ("split", Split()),
+            ("featselect", FeatSelect()),
+            ("model", Model()),
+        ]
+    )
 
     # Set pipeline initial parameters
-    params = {}
+    params = {
+        "preproc__fitted": False,
+        "preproc__target_column": "",
+        "split__fitted": False,
+        "split__target_column": "",
+        "split__split_size": 0.7,
+        "featselect__fitted": False,
+        "featselect__drop_features": 0,
+        "model__fitted": False,
+    }
 
     pipe.set_params(**params)
 
     # Get train data
-    # data = pd.read_csv("train_data.csv")
+    data = pd.read_csv(input_file)
 
     # Train model
-    # with parallel_backend("threading"):
-    #    pipe.fit(data)
+    with parallel_backend("threading"):
+        pipe.fit(data)
 
     # Dump trained model
     joblib.dump(pipe, "../model/model.joblib", compress=2)
 
     # Dump model metrics
-    # metrics = pipe.get_params()["model__metrics"]
-    # metrics["ref_date"] = arguments["date"]
-    # metrics.to_csv("metrics.csv", index=False)
+    metrics = pipe.get_params()["model__metrics"]
+    metrics["ref_date"] = arguments["date"]
+    metrics.to_csv("metrics.csv", index=False)
 
     return
 

@@ -9,6 +9,7 @@ from airflow.contrib.operators.sagemaker_training_operator import (
     SageMakerTrainingOperator,
 )
 from airflow.contrib.operators.sagemaker_model_operator import SageMakerModelOperator
+from airflow.contrib.operators.ssh_operator import SSHOperator
 from aws_operators import (
     DeployModelOperator,
     generate_sagemaker_train_config,
@@ -57,14 +58,16 @@ with DAG(
         model_location="credit-model/model/model.joblib",
         new_version_location="credit-model/train/output-data/20220208/{{ ti.xcom_pull(task_ids='test_training', key='return_value')['Training']['TrainingJobName'] }}/output/model.tar.gz",
         model_filename="model.joblib",
-        restart_model_webserver=True,
-        master_internal_ip="172.31.95.150",
-        master_user="admin",
-        master_model_resource_path="kserve-configs/klarna-case-credit-model.yaml",
+    )
+
+    redeploy_webserver = SSHOperator(
+        task_id="redeploy_webserver",
+        ssh_conn_id="master-node-ssh",
+        command="kubectl replace --force -f kserve-configs/klarna-case-credit-model.yaml",
     )
 
 
-test_athena_operator >> train_op >> deploy_model
+test_athena_operator >> train_op >> deploy_model >> redeploy_webserver
 
 if __name__ == "__main__":
     dag.cli()

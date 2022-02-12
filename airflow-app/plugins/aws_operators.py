@@ -26,10 +26,6 @@ class DeployModelOperator(BaseOperator):
         model_location,
         new_version_location,
         model_filename="model.joblib",
-        restart_model_webserver=False,
-        master_internal_ip=None,
-        master_user=None,
-        master_model_resource_path=None,
         aws_conn_id="aws_default",
         aws_region="us-east-1",
         *args,
@@ -40,10 +36,6 @@ class DeployModelOperator(BaseOperator):
         self.model_location = model_location
         self.new_version_location = new_version_location
         self.model_filename = model_filename
-        self.restart_model_webserver = restart_model_webserver
-        self.master_internal_ip = master_internal_ip
-        self.master_user = master_user
-        self.master_model_resource_path = master_model_resource_path
         self.aws_conn_id = aws_conn_id
         self.aws_region = aws_region
 
@@ -69,33 +61,6 @@ class DeployModelOperator(BaseOperator):
                 )
 
         self.log.info("New version deployed")
-
-        if self.restart_model_webserver:
-
-            self.log.info("Restarting webserver")
-
-            subproc = subprocess.Popen(
-                [
-                    "ssh",
-                    "{user}@{host}".format(
-                        user=self.master_user,
-                        host=self.master_internal_ip,
-                    ),
-                ],
-                shell=True,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-            )
-            out, err = subproc.communicate(
-                "kubectl replace --force -f {config_path}".format(
-                    config_path=self.master_model_resource_path,
-                )
-            )
-
-            self.log.info(out)
-            self.log.info(err)
-
-            self.log.info("Webserver restarted")
 
         return
 

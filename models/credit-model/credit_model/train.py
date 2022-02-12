@@ -61,8 +61,7 @@ def train():
 
     # Dump model metrics
     metrics = pipe.get_params()["model__metrics"]
-    metrics["ref_date"] = arguments["date"]
-    metrics.to_csv("metrics.csv", index=False)
+    metrics.to_csv("../model/metrics.csv", index=False)
 
     return
 

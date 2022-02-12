@@ -5,15 +5,23 @@ from sklearn.base import BaseEstimator, RegressorMixin, TransformerMixin
 from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import Lasso, Ridge
-from sklearn.svm import SVR
-from sklearn.ensemble import RandomForestRegressor
-from sklearn.gaussian_process import GaussianProcessRegressor
-from sklearn.linear_model import LinearRegression
-from sklearn.metrics import mean_squared_error, r2_score
+
+from sklearn.svm import SVC
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.gaussian_process import GaussianProcessClassifier
+from sklearn.linear_model import LogisticRegression
+from xgboost.sklearn import XGBClassifier
+from catboost import CatBoostClassifier
+
+from sklearn.metrics import (
+    roc_auc_score,
+    recall_score,
+    precision_score,
+    f1_score,
+    balanced_accuracy_score,
+)
 from sklearn.cluster import DBSCAN, KMeans
 from sklearn.model_selection import GridSearchCV
-from xgboost.sklearn import XGBRegressor
-from catboost import CatBoostRegressor
 
 # Pre-processing Operator
 class PreProc(BaseEstimator, TransformerMixin):
@@ -316,7 +324,7 @@ class Model(BaseEstimator, RegressorMixin):
 
         # Set param_grid for hyperparameter tunning
 
-        # SVR PARAMS
+        # SVC PARAMS
         # param_grid = {
         #    "kernel": [
         #        "rbf",
@@ -343,7 +351,7 @@ class Model(BaseEstimator, RegressorMixin):
         # R2: 0.358622
         # RMSE: 28.073866
 
-        # RFR PARAMS
+        # RFC PARAMS
         # param_grid = {
         #    "n_estimators": [
         #        100,
@@ -407,7 +415,7 @@ class Model(BaseEstimator, RegressorMixin):
         # R2: 0.111585
         # RMSE: 31.622464
 
-        # LinearRegression
+        # LogisticRegression
         # param_grid = {
         #        "fit_intercept": [
         #            True, # Best
@@ -418,20 +426,20 @@ class Model(BaseEstimator, RegressorMixin):
         # RMSE: 28.031138
 
         # Selected Model
-        # model_lib = SVR()
-        # model_lib = RandomForestRegressor()
-        # model_lib = XGBRegressor()
-        model_lib = CatBoostRegressor()
-        # model_lib = GaussianProcessRegressor()
-        # model_lib = LinearRegression()
+        # model_lib = SVC()
+        # model_lib = RandomForestClassifier()
+        # model_lib = XGBClassifier()
+        model_lib = CatBoostClassifier()
+        # model_lib = GaussianProcessClassifier()
+        # model_lib = LogisticRegression()
 
         # Tune hyperparameters and refit for best metrics
         grid_regressor = GridSearchCV(
             model_lib,
             param_grid=param_grid,
             cv=3,
-            scoring=["r2", "neg_mean_squared_error"],
-            refit="r2",
+            scoring=["roc_auc", "recall", "precision", "f1", "balanced_accuracy"],
+            refit="roc_auc",
             n_jobs=-1,
             verbose=2,
         )
@@ -450,13 +458,19 @@ class Model(BaseEstimator, RegressorMixin):
 
         # Validate model
         test_predictions = pd.Series(regressor.predict(X_test))
+        test_predictions_proba = pd.Series(regressor.predict_proba(X_test))
         y_test = y_test.reset_index(drop=True)
 
         # Validation metrics
         metrics = pd.DataFrame(
             {
-                "RMSE": [math.sqrt(mean_squared_error(y_test, test_predictions))],
-                "R2": [r2_score(y_test, test_predictions)],
+                "roc_auc": [roc_auc_score(y_test, test_predictions_proba)],
+                "recall": [recall_score(y_test, test_predictions)],
+                "precision": [precision_score(y_test, test_predictions)],
+                "f1": [f1_score(y_test, test_predictions)],
+                "balanced_accuracy": [
+                    balanced_accuracy_score(y_test, test_predictions)
+                ],
             }
         )
 

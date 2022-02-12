@@ -41,7 +41,7 @@ with DAG(
     train_op = SageMakerTrainingOperator(
         task_id="test_training",
         config=generate_sagemaker_train_config(
-            "credit_model",
+            "credit-model",
             "klarna-case-model-bucket",
             "klarna-case-sm-role",
             "train.py",

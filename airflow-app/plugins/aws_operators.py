@@ -76,7 +76,7 @@ def generate_sagemaker_train_config(
             "S3OutputPath": "s3://"
             + BUCKET_NAME
             + "/"
-            + MODEL_NAME
+            + MODEL_NAME.replace("_", "-")
             + "/train/output-data/{{ ds_nodash }}"
         },
         "StoppingCondition": {"MaxRuntimeInSeconds": 86400},
@@ -108,7 +108,7 @@ def generate_sagemaker_train_config(
             "sagemaker_submit_directory": '"s3://'
             + BUCKET_NAME
             + "/"
-            + MODEL_NAME
+            + MODEL_NAME.replace("_", "-")
             + "/code/"
             + MODEL_NAME
             + '-1.0.tar.gz"',

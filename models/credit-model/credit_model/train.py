@@ -41,9 +41,9 @@ def train():
     # Set pipeline initial parameters
     params = {
         "preproc__fitted": False,
-        "preproc__target_column": "",
+        "preproc__target_column": "default",
         "split__fitted": False,
-        "split__target_column": "",
+        "split__target_column": "default",
         "split__split_size": 0.7,
         "featselect__fitted": False,
         "featselect__drop_features": 0,

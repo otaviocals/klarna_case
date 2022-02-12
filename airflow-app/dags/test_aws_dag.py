@@ -33,7 +33,7 @@ with DAG(
 
     test_athena_operator = AWSAthenaOperator(
         task_id=f"run_query_test",
-        query="select * from credit_train_data where has_paid=TRUE",
+        query="select * from credit_train_data where default is not NULL",
         output_location="s3://klarna-case-model-bucket/credit-model/train/raw-train-data/{{ ds_nodash }}",
         database="klarna_case",
     )

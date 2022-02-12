@@ -8,14 +8,13 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import Lasso, Ridge
 from sklearn.svm import SVR
 from sklearn.ensemble import RandomForestRegressor
-from xgboost.sklearn import XGBRegressor
-from catboost import CatBoostRegressor
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.cluster import DBSCAN, KMeans
 from sklearn.model_selection import GridSearchCV
-from googleapiclient import discovery
+from xgboost.sklearn import XGBRegressor
+from catboost import CatBoostRegressor
 
 # Pre-processing Operator
 class PreProc(BaseEstimator, TransformerMixin):

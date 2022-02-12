@@ -69,7 +69,7 @@ def generate_sagemaker_train_config(
 ):
     config = {
         "AlgorithmSpecification": {
-            "TrainingImage": "025105345127.dkr.ecr.us-east-1.amazonaws.com/klarna-case:latest",
+            "TrainingImage": "025105345127.dkr.ecr.us-east-1.amazonaws.com/klarna-case-train:latest",
             "TrainingInputMode": "File",
         },
         "OutputDataConfig": {

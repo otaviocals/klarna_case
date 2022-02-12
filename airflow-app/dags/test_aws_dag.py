@@ -57,9 +57,10 @@ with DAG(
         model_location="credit-model/model/model.joblib",
         new_version_location="credit-model/train/output-data/20220208/{{ ti.xcom_pull(task_ids='test_training', key='return_value')['Training']['TrainingJobName'] }}/output/model.tar.gz",
         model_filename="model.joblib",
-        restart_model_webserver=False,
-        master_internal_ip=None,
-        master_model_resource_path=None,
+        restart_model_webserver=True,
+        master_internal_ip="172.31.95.150",
+        master_user="admin",
+        master_model_resource_path="kserve-configs/klarna-case-credit-model.yaml",
     )
 
 

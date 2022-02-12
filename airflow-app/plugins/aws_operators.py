@@ -1,7 +1,7 @@
 from airflow.models import BaseOperator
 from airflow.utils.decorators import apply_defaults
 from datetime import datetime
-from tempfile import NamedTemporaryFilei, TemporaryDirectory
+from tempfile import NamedTemporaryFile, TemporaryDirectory
 import boto3
 import tarfile
 

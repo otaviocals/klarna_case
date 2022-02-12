@@ -21,6 +21,8 @@ def train():
 
     # Load data
     input_files = os.listdir("../input/data/training")
+    logging.info(input_files)
+    print(input_files)
 
     p = re.compile("\.csv$")
     input_file = [s for s in input_files if p.match(s)][0]

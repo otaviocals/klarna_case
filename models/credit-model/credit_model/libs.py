@@ -32,7 +32,7 @@ class PreProc(BaseEstimator, TransformerMixin):
         target_column = self.target_column
 
         # Set Categorical & Geographic Features
-        categoricals = ["merchant_category", "merchant_group"]
+        categoricals = ["merchant_category", "merchant_group", "name_in_email"]
         geos = []
 
         print("Preprocessing data")

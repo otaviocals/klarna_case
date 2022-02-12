@@ -13,6 +13,7 @@ from sklearn.linear_model import LogisticRegression
 from xgboost.sklearn import XGBClassifier
 from catboost import CatBoostClassifier
 
+from sklearn.calibration import CalibratedClassifierCV
 from sklearn.metrics import (
     roc_auc_score,
     recall_score,
@@ -595,7 +596,11 @@ class Model(BaseEstimator, RegressorMixin):
         print(grid_regressor.best_params_)
 
         # Get best model
-        regressor = grid_regressor.best_estimator_
+        regressor_uncal = grid_regressor.best_estimator_
+
+        # Calibrate model
+        regressor = CalibratedClassifierCV(regressor_uncal, cv=5, method="sigmoid")
+        regressor.fit(X_train, y_train)
 
         # Validate model
         test_predictions = pd.Series(regressor.predict(X_test))
@@ -633,8 +638,8 @@ class Model(BaseEstimator, RegressorMixin):
         # Get predictions
         predictions = regressor.predict_proba(X)[:, 1]
         predictions.columns = ["predictions"]
-        predictions.loc[predictions["predictions"] >= self.cutoff, "predictions"] = 1
-        predictions.loc[predictions["predictions"] < self.cutoff, "predictions"] = 0
+        # predictions.loc[predictions["predictions"] >= self.cutoff, "predictions"] = 1
+        # predictions.loc[predictions["predictions"] < self.cutoff, "predictions"] = 0
 
         # Merge Predictions to features
         X = X.merge(predictions, left_index=True, right_index=True)

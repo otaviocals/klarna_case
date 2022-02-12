@@ -36,7 +36,7 @@ class DeployModelOperator(BaseOperator):
         self.model_filename = model_filename
         self.restart_model_webserver = restart_model_webserver
         self.master_internal_ip = master_internal_ip
-        self.master_model_resource_path = master_model_resouce_path
+        self.master_model_resource_path = master_model_resource_path
 
     def execute(self, context):
 

@@ -114,10 +114,10 @@ def generate_sagemaker_train_config(
             + '-1.0.tar.gz"',
             "sagemaker_program": MODEL_NAME + "-1.0/" + MODEL_NAME + "/" + TRAIN_SCRIPT,
             "sagemaker_container_log_level": "20",
-            "sagemaker_job_name": MODEL_NAME + "-{{ ts_nodash }}",
+            "sagemaker_job_name": MODEL_NAME.replace("_", "-") + "-{{ ts_nodash }}",
             "sagemaker_region": REGION,
         },
-        "TrainingJobName": MODEL_NAME + "-{{ ts_nodash }}",
+        "TrainingJobName": MODEL_NAME.replace("_", "-") + "-{{ ts_nodash }}",
     }
     return config
 

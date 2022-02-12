@@ -24,6 +24,8 @@ def train():
 
     p = re.compile("\.csv$")
     input_file = [s for s in input_files if p.match(s)]
+
+    logging.info(input_files)
     logging.info(input_file)
 
     # Create model operators pipeline

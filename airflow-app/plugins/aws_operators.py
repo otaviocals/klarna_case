@@ -30,6 +30,7 @@ class DeployModelOperator(BaseOperator):
         *args,
         **kwargs
     ):
+        super(DeployModelOperator, self).__init__(*args, **kwargs)
         self.model_bucket = model_bucket
         self.model_location = model_location
         self.new_version_location = new_version_location

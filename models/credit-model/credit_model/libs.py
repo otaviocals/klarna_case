@@ -458,7 +458,7 @@ class Model(BaseEstimator, RegressorMixin):
 
         # Validate model
         test_predictions = pd.Series(regressor.predict(X_test))
-        test_predictions_proba = pd.Series(regressor.predict_proba(X_test))
+        test_predictions_proba = pd.Series(regressor.predict_proba(X_test)[:, 1])
         y_test = y_test.reset_index(drop=True)
 
         # Validation metrics

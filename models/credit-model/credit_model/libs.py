@@ -32,7 +32,7 @@ class PreProc(BaseEstimator, TransformerMixin):
         target_column = self.target_column
 
         # Set Categorical & Geographic Features
-        categoricals = []
+        categoricals = ["merchant_category", "merchant_group"]
         geos = []
 
         print("Preprocessing data")
@@ -41,7 +41,7 @@ class PreProc(BaseEstimator, TransformerMixin):
         if not self.fitted:
 
             # Drop unused Features
-            # X = X.drop(["promised_time"], axis=1)
+            X = X.drop(["uuid"], axis=1)
 
             encoders = {}
             geo_encoders = {}

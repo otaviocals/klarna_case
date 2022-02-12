@@ -25,8 +25,11 @@ from sklearn.model_selection import GridSearchCV
 
 # Pre-processing Operator
 class PreProc(BaseEstimator, TransformerMixin):
-    def __init__(self, target_column="", fitted=False, encoders={}, geo_encoders={}):
+    def __init__(
+        self, target_column="", columns=None, fitted=False, encoders={}, geo_encoders={}
+    ):
         self.target_column = target_column
+        self.columns = columns
         self.fitted = fitted
         self.encoders = encoders
         self.geo_encoders = geo_encoders
@@ -35,6 +38,9 @@ class PreProc(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X):
+
+        # Set Data Columns
+        columns = list(X.columns)
 
         # Set Target Feature
         target_column = self.target_column
@@ -106,6 +112,7 @@ class PreProc(BaseEstimator, TransformerMixin):
 
             # Set params for predict
             params = {
+                "columns": columns,
                 "encoders": encoders,
                 "geo_encoders": geo_encoders,
                 "fitted": True,
@@ -124,46 +131,96 @@ class PreProc(BaseEstimator, TransformerMixin):
                 if len(X.columns) == 17:
                     print("Batch prediction")
                     X.columns = [
-                        "order_lat",
-                        "order_lng",
-                        "promised_time",
-                        "hour",
-                        "on_demand",
-                        "relat_vol",
-                        "sum_un",
-                        "sum_kg",
-                        "seniority",
-                        "found_rate",
-                        "picking_speed",
-                        "accepted_rate",
-                        "rating",
-                        "store_id",
-                        "store_lat",
-                        "store_lng",
-                        "distance",
+                        "uuid",
+                        "account_amount_added_12_24m",
+                        "account_days_in_dc_12_24m",
+                        "account_days_in_rem_12_24m",
+                        "account_days_in_term_12_24m",
+                        "account_incoming_debt_vs_paid_0_24m",
+                        "account_status",
+                        "account_worst_status_0_3m",
+                        "account_worst_status_12_24m",
+                        "account_worst_status_3_6m",
+                        "account_worst_status_6_12m",
+                        "age",
+                        "avg_payment_span_0_12m",
+                        "avg_payment_span_0_3m",
+                        "merchant_category",
+                        "merchant_group",
+                        "has_paid",
+                        "max_paid_inv_0_12m",
+                        "max_paid_inv_0_24m",
+                        "name_in_email",
+                        "num_active_div_by_paid_inv_0_12m",
+                        "num_active_inv",
+                        "num_arch_dc_0_12m",
+                        "num_arch_dc_12_24m",
+                        "num_arch_ok_0_12m",
+                        "num_arch_ok_12_24m",
+                        "num_arch_rem_0_12m",
+                        "num_arch_written_off_0_12m",
+                        "num_arch_written_off_12_24m",
+                        "num_unpaid_bills",
+                        "status_last_archived_0_24m",
+                        "status_2nd_last_archived_0_24m",
+                        "status_3rd_last_archived_0_24m",
+                        "status_max_archived_0_6_months",
+                        "status_max_archived_0_12_months",
+                        "status_max_archived_0_24_months",
+                        "recovery_debt",
+                        "sum_capital_paid_account_0_12m",
+                        "sum_capital_paid_account_12_24m",
+                        "sum_paid_inv_0_12m",
+                        "time_hours",
+                        "worst_status_active_inv",
                     ]
                 # Validation prediction (with target)
                 elif len(X.columns) == 18:
                     print("Validation prediction")
                     X.columns = [
-                        "order_lat",
-                        "order_lng",
-                        "promised_time",
-                        "hour",
-                        "on_demand",
-                        "relat_vol",
-                        "sum_un",
-                        "sum_kg",
-                        "seniority",
-                        "found_rate",
-                        "picking_speed",
-                        "accepted_rate",
-                        "rating",
-                        "store_id",
-                        "store_lat",
-                        "store_lng",
-                        "distance",
-                        "total_minute",
+                        "uuid",
+                        "default",
+                        "account_amount_added_12_24m",
+                        "account_days_in_dc_12_24m",
+                        "account_days_in_rem_12_24m",
+                        "account_days_in_term_12_24m",
+                        "account_incoming_debt_vs_paid_0_24m",
+                        "account_status",
+                        "account_worst_status_0_3m",
+                        "account_worst_status_12_24m",
+                        "account_worst_status_3_6m",
+                        "account_worst_status_6_12m",
+                        "age",
+                        "avg_payment_span_0_12m",
+                        "avg_payment_span_0_3m",
+                        "merchant_category",
+                        "merchant_group",
+                        "has_paid",
+                        "max_paid_inv_0_12m",
+                        "max_paid_inv_0_24m",
+                        "name_in_email",
+                        "num_active_div_by_paid_inv_0_12m",
+                        "num_active_inv",
+                        "num_arch_dc_0_12m",
+                        "num_arch_dc_12_24m",
+                        "num_arch_ok_0_12m",
+                        "num_arch_ok_12_24m",
+                        "num_arch_rem_0_12m",
+                        "num_arch_written_off_0_12m",
+                        "num_arch_written_off_12_24m",
+                        "num_unpaid_bills",
+                        "status_last_archived_0_24m",
+                        "status_2nd_last_archived_0_24m",
+                        "status_3rd_last_archived_0_24m",
+                        "status_max_archived_0_6_months",
+                        "status_max_archived_0_12_months",
+                        "status_max_archived_0_24_months",
+                        "recovery_debt",
+                        "sum_capital_paid_account_0_12m",
+                        "sum_capital_paid_account_12_24m",
+                        "sum_paid_inv_0_12m",
+                        "time_hours",
+                        "worst_status_active_inv",
                     ]
 
             if target_column in X.columns:
@@ -316,6 +373,52 @@ class Model(BaseEstimator, RegressorMixin):
         self.model = model
         self.metrics = metrics
 
+    def cutoff_analysis(y_test, test_predictions_proba):
+
+        metrics = pd.DataFrame(
+            columns=[
+                "cutoff",
+                "vol_1",
+                "vol_0",
+                "roc_auc",
+                "recall",
+                "precision",
+                "f1",
+                "balanced_accuracy",
+            ]
+        )
+
+        for i in range(0, 100):
+
+            predictions_cutoff = i / 100
+
+            test_predictions_proba_cut = test_predictions_proba.copy()
+            test_predictions_proba_cut.loc[
+                test_predictions_proba_cut >= predictions_cutoff
+            ] = 1
+            test_predictions_proba_cut.loc[
+                test_predictions_proba_cut < predictions_cutoff
+            ] = 0
+
+            metric = pd.DataFrame(
+                {
+                    "cutoff": [predictions_cutoff],
+                    "vol_1": [len(test_predictions_cut.loc[test_predictions_cut == 1])],
+                    "vol_0": [len(test_predictions_cut.loc[test_predictions_cut == 0])],
+                    "roc_auc": [roc_auc_score(y_test, test_predictions_proba_cut)],
+                    "recall": [recall_score(y_test, test_predictions_proba_cut)],
+                    "precision": [precision_score(y_test, test_predictions_proba_cut)],
+                    "f1": [f1_score(y_test, test_predictions_proba_cut)],
+                    "balanced_accuracy": [
+                        balanced_accuracy_score(y_test, test_predictions_proba_cut)
+                    ],
+                }
+            )
+
+            metrics = metrics.append(metric)
+
+        return metrics
+
     def fit(self, X=None, y=None):
 
         print("Training model")
@@ -462,17 +565,19 @@ class Model(BaseEstimator, RegressorMixin):
         y_test = y_test.reset_index(drop=True)
 
         # Validation metrics
-        metrics = pd.DataFrame(
-            {
-                "roc_auc": [roc_auc_score(y_test, test_predictions_proba)],
-                "recall": [recall_score(y_test, test_predictions)],
-                "precision": [precision_score(y_test, test_predictions)],
-                "f1": [f1_score(y_test, test_predictions)],
-                "balanced_accuracy": [
-                    balanced_accuracy_score(y_test, test_predictions)
-                ],
-            }
-        )
+        # metrics = pd.DataFrame(
+        #    {
+        #        "roc_auc": [roc_auc_score(y_test, test_predictions_proba)],
+        #        "recall": [recall_score(y_test, test_predictions)],
+        #        "precision": [precision_score(y_test, test_predictions)],
+        #        "f1": [f1_score(y_test, test_predictions)],
+        #        "balanced_accuracy": [
+        #            balanced_accuracy_score(y_test, test_predictions)
+        #        ],
+        #    }
+        # )
+
+        metrics = cutoff_analysis(y_test, test_predictions_proba)
 
         print(metrics)
 

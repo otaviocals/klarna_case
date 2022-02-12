@@ -465,8 +465,11 @@ class Model(BaseEstimator, RegressorMixin):
         #        "auto"
         #    ],
         # }
-        # R2: 0.358622
-        # RMSE: 28.073866
+        # ROC_AUC:   0.
+        # RECAL:     0.
+        # F1:        0.
+        # PRECISION: 0.
+        # BAL_ACC:   0.
 
         # RFC PARAMS
         # param_grid = {
@@ -489,38 +492,48 @@ class Model(BaseEstimator, RegressorMixin):
         #        False # BEST
         #    ],
         # }
-        # R2:  0.493913
-        # RMSE: 24.450065
+        # ROC_AUC:   0.
+        # RECAL:     0.
+        # F1:        0.
+        # PRECISION: 0.
+        # BAL_ACC:   0.
 
         # XGBoost Params
-        # param_grid = {
-        #    "n_estimators": [
-        #        500, # BEST
-        #        3000
-        #    ],
-        #    "learning_rate": [
-        #        0.01,
-        #        0.03, # BEST
-        #        0.07
-        #    ],
-        #    "max_depth": [
-        #        4, # BEST
-        #        5,
-        #        7
-        #    ],
-        # }
-        # R2: 0.511957
-        # RMSE:  24.372637
+        param_grid = {
+            "n_estimators": [500, 3000],  # BEST
+            "learning_rate": [0.01, 0.03, 0.07],  # BEST
+            "max_depth": [4, 5, 7],  # BEST
+        }
+        # ROC_AUC:   0.
+        # RECAL:     0.
+        # F1:        0.
+        # PRECISION: 0.
+        # BAL_ACC:   0.
 
         # CatBoost Params
-        param_grid = {
-            "depth": [4, 6, 10],  # BEST
-            "learning_rate": [0.01, 0.1, 0.3],  # BEST
-            "iterations": [30, 100, 400],  # BEST
-            "silent": [True],
-        }
-        # R2: 0.555919
-        # RMSE:   23.439524
+        # param_grid = {
+        #    "depth": [
+        #        4, # BEST
+        #        #6,
+        #        #10
+        #        ],
+        #    "learning_rate": [
+        #        #0.01,
+        #        0.1, #BEST
+        #        #0.3
+        #        ],
+        #    "iterations": [
+        #        #30,
+        #        #100,
+        #        400 # BEST
+        #        ],
+        #    "silent": [True],
+        # }
+        # ROC_AUC:   0.68
+        # RECAL:     0.37
+        # F1:        0.28
+        # PRECISION: 0.22
+        # BAL_ACC:   0.68
 
         # GaussianMixture
         # param_grid = {
@@ -529,8 +542,11 @@ class Model(BaseEstimator, RegressorMixin):
         #            False
         #    ]
         # }
-        # R2: 0.111585
-        # RMSE: 31.622464
+        # ROC_AUC:   0.
+        # RECAL:     0.
+        # F1:        0.
+        # PRECISION: 0.
+        # BAL_ACC:   0.
 
         # LogisticRegression
         # param_grid = {
@@ -539,14 +555,17 @@ class Model(BaseEstimator, RegressorMixin):
         #            False
         #    ]
         # }
-        # R2: 0.36929
-        # RMSE: 28.031138
+        # ROC_AUC:   0.
+        # RECAL:     0.
+        # F1:        0.
+        # PRECISION: 0.
+        # BAL_ACC:   0.
 
         # Selected Model
         # model_lib = SVC()
         # model_lib = RandomForestClassifier()
-        # model_lib = XGBClassifier()
-        model_lib = CatBoostClassifier()
+        model_lib = XGBClassifier()
+        # model_lib = CatBoostClassifier()
         # model_lib = GaussianProcessClassifier()
         # model_lib = LogisticRegression()
 
@@ -580,9 +599,8 @@ class Model(BaseEstimator, RegressorMixin):
 
         # Validation metrics
         metrics = cutoff_analysis(y_test, test_predictions_proba)
-        best_cutoff = float(
-            metrics.sort_values(by="f1", ascending=False).head(1)["cutoff"]
-        )
+        metrics = metrics.sort_values(by="f1", ascending=False)
+        best_cutoff = float(metrics.head(1)["cutoff"])
         print(metrics)
         print("Best cutoff: " + str(best_cutoff))
 
@@ -591,7 +609,7 @@ class Model(BaseEstimator, RegressorMixin):
             "model": regressor,
             "metrics": metrics,
             "fitted": True,
-            cutoff: best_cutoff,
+            "cutoff": best_cutoff,
         }
 
         self.set_params(**params)
@@ -608,7 +626,8 @@ class Model(BaseEstimator, RegressorMixin):
         regressor = self.model
 
         # Get predictions
-        predictions = pd.DataFrame(regressor.predict_proba(X), columns=["predictions"])
+        predictions = regressor.predict_proba(X)[:, 1]
+        predictions.columns = ["predictions"]
         predictions.loc[predictions["predictions"] >= self.cutoff, "predictions"] = 1
         predictions.loc[predictions["predictions"] < self.cutoff, "predictions"] = 0
 

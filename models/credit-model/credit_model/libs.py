@@ -368,8 +368,9 @@ class FeatSelect(BaseEstimator, TransformerMixin):
 
 # Model Operator
 class Model(BaseEstimator, RegressorMixin):
-    def __init__(self, fitted=False, model=None, metrics=None):
+    def __init__(self, fitted=False, model=None, metrics=None, cutoff=0.5):
         self.fitted = fitted
+        self.cutoff = cutoff
         self.model = model
         self.metrics = metrics
 
@@ -578,24 +579,20 @@ class Model(BaseEstimator, RegressorMixin):
         y_test = y_test.reset_index(drop=True)
 
         # Validation metrics
-        # metrics = pd.DataFrame(
-        #    {
-        #        "roc_auc": [roc_auc_score(y_test, test_predictions_proba)],
-        #        "recall": [recall_score(y_test, test_predictions)],
-        #        "precision": [precision_score(y_test, test_predictions)],
-        #        "f1": [f1_score(y_test, test_predictions)],
-        #        "balanced_accuracy": [
-        #            balanced_accuracy_score(y_test, test_predictions)
-        #        ],
-        #    }
-        # )
-
         metrics = cutoff_analysis(y_test, test_predictions_proba)
-
+        best_cutoff = float(
+            metrics.sort_values(by="f1", ascending=False).head(1)["cutoff"]
+        )
         print(metrics)
+        print("Best cutoff: " + best_cutoff)
 
         # Set params for predict
-        params = {"model": regressor, "metrics": metrics, "fitted": True}
+        params = {
+            "model": regressor,
+            "metrics": metrics,
+            "fitted": True,
+            cutoff: best_cutoff,
+        }
 
         self.set_params(**params)
 
@@ -611,7 +608,9 @@ class Model(BaseEstimator, RegressorMixin):
         regressor = self.model
 
         # Get predictions
-        predictions = pd.DataFrame(regressor.predict(X), columns=["predictions"])
+        predictions = pd.DataFrame(regressor.predict_proba(X), columns=["predictions"])
+        predictions.loc[predictions["predictions"] >= self.cutoff, "predictions"] = 1
+        predictions.loc[predictions["predictions"] < self.cutoff, "predictions"] = 0
 
         # Merge Predictions to features
         X = X.merge(predictions, left_index=True, right_index=True)

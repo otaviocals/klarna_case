@@ -461,7 +461,6 @@ class Model(BaseEstimator, RegressorMixin):
                 1.0,  # BEST
                 2.0,
             ],
-            "epsilon": [0.1, 0.2, 0.5],  # BEST
             "gamma": ["scale", "auto"],  # BEST
         }
         # ROC_AUC:   0.

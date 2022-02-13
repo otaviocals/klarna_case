@@ -547,7 +547,7 @@ class Model(BaseEstimator, RegressorMixin):
         # GaussianProcessClassifier
         param_grid = {
             "max_iter_predict": [10, 100],
-            "n_restarts_optimizer": [0, 5, 10],
+            "n_restarts_optimizer": [0, 2],
             "warm_start": [True, False],
         }
         # ROC_AUC:   0.

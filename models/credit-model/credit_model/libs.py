@@ -448,21 +448,21 @@ class Model(BaseEstimator, RegressorMixin):
         # Set param_grid for hyperparameter tunning
 
         # SVC PARAMS
-        param_grid = {
-            "kernel": [
-                "rbf",
-                "linear",  # BEST
-                # "poly",
-                "sigmoid",
-            ],
-            "C": [
-                # 0.0,
-                0.5,
-                1.0,  # BEST
-                2.0,
-            ],
-            "gamma": ["scale", "auto"],  # BEST
-        }
+        # param_grid = {
+        #    "kernel": [
+        #        "rbf",
+        #        "linear",
+        #        # "poly",
+        #        "sigmoid",
+        #    ],
+        #    "C": [
+        #        # 0.0,
+        #        0.5,
+        #        1.0,
+        #        2.0,
+        #    ],
+        #    "gamma": ["scale", "auto"],
+        # }
         # ROC_AUC:   0.
         # RECAL:     0.
         # F1:        0.
@@ -558,12 +558,12 @@ class Model(BaseEstimator, RegressorMixin):
         # BAL_ACC:   0.
 
         # LogisticRegression
-        # param_grid = {
-        #        "fit_intercept": [
-        #            True, # Best
-        #            False
-        #    ]
-        # }
+        param_grid = {
+            "fit_intercept": [True, False],  # Best
+            "penalty": ["l1", "l2", "elasticnet"],
+            "class_weight": ["balanced", None],
+            "solver": ["newton-cg", "lbfgs", "liblinear"],
+        }
         # ROC_AUC:   0.
         # RECAL:     0.
         # F1:        0.
@@ -571,12 +571,12 @@ class Model(BaseEstimator, RegressorMixin):
         # BAL_ACC:   0.
 
         # Selected Model
-        model_lib = SVC()
+        # model_lib = SVC()
         # model_lib = RandomForestClassifier()
         # model_lib = XGBClassifier()
         # model_lib = CatBoostClassifier()
         # model_lib = GaussianProcessClassifier()
-        # model_lib = LogisticRegression()
+        model_lib = LogisticRegression()
 
         # Tune hyperparameters and refit for best metrics
         grid_regressor = GridSearchCV(

@@ -497,22 +497,22 @@ class Model(BaseEstimator, RegressorMixin):
         # BAL_ACC:   0.65
 
         # XGBoost Params
-        # param_grid = {
-        #   "n_estimators": [
-        #       500, #BEST
-        #       #3000
-        #       ],
-        #   "learning_rate": [
-        #       #0.01,
-        #       0.03, # BEST
-        #       #0.07
-        #       ],
-        #   "max_depth": [
-        #       4, # BEST
-        #       #5,
-        #       #7
-        #       ],
-        # }
+        param_grid = {
+            "n_estimators": [
+                500,  # BEST
+                # 3000
+            ],
+            "learning_rate": [
+                # 0.01,
+                0.03,  # BEST
+                # 0.07
+            ],
+            "max_depth": [
+                4,  # BEST
+                # 5,
+                # 7
+            ],
+        }
         # ROC_AUC:   0.70
         # RECAL:     0.42
         # F1:        0.29
@@ -520,24 +520,24 @@ class Model(BaseEstimator, RegressorMixin):
         # BAL_ACC:   0.70
 
         # CatBoost Params
-        param_grid = {
-            "depth": [
-                4,  # BEST
-                # 6,
-                # 10
-            ],
-            "learning_rate": [
-                # 0.01,
-                0.1,  # BEST
-                # 0.3
-            ],
-            "iterations": [
-                # 30,
-                # 100,
-                400  # BEST
-            ],
-            "silent": [True],
-        }
+        # param_grid = {
+        #    "depth": [
+        #        4,  # BEST
+        #        # 6,
+        #        # 10
+        #    ],
+        #    "learning_rate": [
+        #        # 0.01,
+        #        0.1,  # BEST
+        #        # 0.3
+        #    ],
+        #    "iterations": [
+        #        # 30,
+        #        # 100,
+        #        400  # BEST
+        #    ],
+        #    "silent": [True],
+        # }
         # ROC_AUC:   0.68
         # RECAL:     0.37
         # F1:        0.28

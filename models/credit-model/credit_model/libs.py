@@ -448,29 +448,22 @@ class Model(BaseEstimator, RegressorMixin):
         # Set param_grid for hyperparameter tunning
 
         # SVC PARAMS
-        # param_grid = {
-        #    "kernel": [
-        #        "rbf",
-        #        "linear",    # BEST
-        #        # "poly",
-        #        "sigmoid",
-        #    ],
-        #    "C": [
-        #        # 0.0,
-        #        0.5,
-        #        1.0,   # BEST
-        #        2.0,
-        #    ],
-        #    "epsilon": [
-        #        0.1,  # BEST
-        #        0.2,
-        #        0.5
-        #    ],
-        #    "gamma": [
-        #        "scale", # BEST
-        #        "auto"
-        #    ],
-        # }
+        param_grid = {
+            "kernel": [
+                "rbf",
+                "linear",  # BEST
+                # "poly",
+                "sigmoid",
+            ],
+            "C": [
+                # 0.0,
+                0.5,
+                1.0,  # BEST
+                2.0,
+            ],
+            "epsilon": [0.1, 0.2, 0.5],  # BEST
+            "gamma": ["scale", "auto"],  # BEST
+        }
         # ROC_AUC:   0.
         # RECAL:     0.
         # F1:        0.
@@ -478,17 +471,31 @@ class Model(BaseEstimator, RegressorMixin):
         # BAL_ACC:   0.
 
         # RFC PARAMS
-        param_grid = {
-            "n_estimators": [100, 300, 1000],  # BEST
-            "min_samples_split": [2, 10, 40],  # BEST
-            "max_features": ["auto", "sqrt"],  # BEST
-            "bootstrap": [True, False],  # BEST
-        }
-        # ROC_AUC:   0.
-        # RECAL:     0.
-        # F1:        0.
-        # PRECISION: 0.
-        # BAL_ACC:   0.
+        # param_grid = {
+        #    "n_estimators": [
+        #        #100,
+        #        #300,
+        #        1000 # BEST
+        #        ],
+        #    "min_samples_split": [
+        #        #2,
+        #        #10,
+        #        40 # BEST
+        #        ],
+        #    "max_features": [
+        #        "auto", # BEST
+        #        #"sqrt"
+        #        ],
+        #    "bootstrap": [
+        #        True, # BEST
+        #        #False
+        #        ],
+        # }
+        # ROC_AUC:   0.65
+        # RECAL:     0.31
+        # F1:        0.31
+        # PRECISION: 0.30
+        # BAL_ACC:   0.65
 
         # XGBoost Params
         # param_grid = {
@@ -565,8 +572,8 @@ class Model(BaseEstimator, RegressorMixin):
         # BAL_ACC:   0.
 
         # Selected Model
-        # model_lib = SVC()
-        model_lib = RandomForestClassifier()
+        model_lib = SVC()
+        # model_lib = RandomForestClassifier()
         # model_lib = XGBClassifier()
         # model_lib = CatBoostClassifier()
         # model_lib = GaussianProcessClassifier()

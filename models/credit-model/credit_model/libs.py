@@ -478,26 +478,12 @@ class Model(BaseEstimator, RegressorMixin):
         # BAL_ACC:   0.
 
         # RFC PARAMS
-        # param_grid = {
-        #    "n_estimators": [
-        #        100,
-        #        300,
-        #        1000 # BEST
-        #    ],
-        #    "min_samples_split": [
-        #        2, # BEST
-        #        10,
-        #        40
-        #    ],
-        #    "max_features": [
-        #        "auto",
-        #        "sqrt" # BEST
-        #    ],
-        #    "bootstrap": [
-        #        True,
-        #        False # BEST
-        #    ],
-        # }
+        param_grid = {
+            "n_estimators": [100, 300, 1000],  # BEST
+            "min_samples_split": [2, 10, 40],  # BEST
+            "max_features": ["auto", "sqrt"],  # BEST
+            "bootstrap": [True, False],  # BEST
+        }
         # ROC_AUC:   0.
         # RECAL:     0.
         # F1:        0.
@@ -505,16 +491,27 @@ class Model(BaseEstimator, RegressorMixin):
         # BAL_ACC:   0.
 
         # XGBoost Params
-        param_grid = {
-            "n_estimators": [500, 3000],  # BEST
-            "learning_rate": [0.01, 0.03, 0.07],  # BEST
-            "max_depth": [4, 5, 7],  # BEST
-        }
-        # ROC_AUC:   0.
-        # RECAL:     0.
-        # F1:        0.
-        # PRECISION: 0.
-        # BAL_ACC:   0.
+        # param_grid = {
+        #    "n_estimators": [
+        #        500, #BEST
+        #        #3000
+        #        ],
+        #    "learning_rate": [
+        #        #0.01,
+        #        0.03, # BEST
+        #        #0.07
+        #        ],
+        #    "max_depth": [
+        #        4, # BEST
+        #        #5,
+        #        #7
+        #        ],
+        # }
+        # ROC_AUC:   0.70
+        # RECAL:     0.42
+        # F1:        0.29
+        # PRECISION: 0.23
+        # BAL_ACC:   0.70
 
         # CatBoost Params
         # param_grid = {
@@ -569,8 +566,8 @@ class Model(BaseEstimator, RegressorMixin):
 
         # Selected Model
         # model_lib = SVC()
-        # model_lib = RandomForestClassifier()
-        model_lib = XGBClassifier()
+        model_lib = RandomForestClassifier()
+        # model_lib = XGBClassifier()
         # model_lib = CatBoostClassifier()
         # model_lib = GaussianProcessClassifier()
         # model_lib = LogisticRegression()

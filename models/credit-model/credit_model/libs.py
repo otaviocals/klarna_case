@@ -544,25 +544,11 @@ class Model(BaseEstimator, RegressorMixin):
         # PRECISION: 0.22
         # BAL_ACC:   0.68
 
-        # GaussianMixture
-        # param_grid = {
-        #        "normalize_y": [
-        #            True, # Best
-        #            False
-        #    ]
-        # }
-        # ROC_AUC:   0.
-        # RECAL:     0.
-        # F1:        0.
-        # PRECISION: 0.
-        # BAL_ACC:   0.
-
-        # LogisticRegression
+        # GaussianProcessClassifier
         param_grid = {
-            "fit_intercept": [True, False],  # Best
-            "penalty": ["l1", "l2", "elasticnet"],
-            "class_weight": ["balanced", None],
-            "solver": ["newton-cg", "lbfgs", "liblinear"],
+            "max_iter_predict": [10, 100, 1000],
+            "n_restarts_optimizer": [0, 5, 10],
+            "warm_start": [True, False],
         }
         # ROC_AUC:   0.
         # RECAL:     0.
@@ -570,13 +556,40 @@ class Model(BaseEstimator, RegressorMixin):
         # PRECISION: 0.
         # BAL_ACC:   0.
 
+        # LogisticRegression
+        # param_grid = {
+        #    "fit_intercept": [
+        #        True, # BEST
+        #        #False
+        #        ],
+        #    "penalty": [
+        #        "l1", # BEST
+        #        #"l2",
+        #        #"elasticnet"
+        #        ],
+        #    "class_weight": [
+        #        "balanced", # BEST
+        #        #None
+        #        ],
+        #    "solver": [
+        #        #"newton-cg",
+        #        #"lbfgs",
+        #        "liblinear" # BEST
+        #        ],
+        # }
+        # ROC_AUC:   0.65
+        # RECAL:     0.33
+        # F1:        0.24
+        # PRECISION: 0.20
+        # BAL_ACC:   0.65
+
         # Selected Model
         # model_lib = SVC()
         # model_lib = RandomForestClassifier()
         # model_lib = XGBClassifier()
         # model_lib = CatBoostClassifier()
-        # model_lib = GaussianProcessClassifier()
-        model_lib = LogisticRegression()
+        model_lib = GaussianProcessClassifier()
+        # model_lib = LogisticRegression()
 
         # Tune hyperparameters and refit for best metrics
         grid_regressor = GridSearchCV(

@@ -43,7 +43,7 @@ def train():
         "split__target_column": "default",
         "split__split_size": 0.7,
         "featselect__fitted": False,
-        "featselect__drop_features": 0,
+        "featselect__drop_features": 5,
         "model__fitted": False,
     }
 

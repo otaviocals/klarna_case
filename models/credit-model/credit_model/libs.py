@@ -134,7 +134,7 @@ class PreProc(BaseEstimator, TransformerMixin):
                 X = pd.DataFrame(X)
 
                 # Batch prediction (no target)
-                if len(X.columns) == 17:
+                if len(X.columns) == 42:
                     print("Batch prediction")
                     X.columns = [
                         "uuid",
@@ -181,7 +181,7 @@ class PreProc(BaseEstimator, TransformerMixin):
                         "worst_status_active_inv",
                     ]
                 # Validation prediction (with target)
-                elif len(X.columns) == 18:
+                elif len(X.columns) == 43:
                     print("Validation prediction")
                     X.columns = [
                         "uuid",
@@ -228,12 +228,15 @@ class PreProc(BaseEstimator, TransformerMixin):
                         "time_hours",
                         "worst_status_active_inv",
                     ]
+                # Online Prediction
+                elif len(X.columns) == 1:
+                    print("Online predcition")
 
             if target_column in X.columns:
                 X = X.drop([target_column], axis=1)
 
             # Drop unused Features
-            X = X.drop(["promised_time"], axis=1)
+            X = X.drop(["uuid"], axis=1)
 
             # Load Categorical and Geographical Encoders
             encoders = self.encoders
@@ -345,6 +348,8 @@ class FeatSelect(BaseEstimator, TransformerMixin):
 
             print("Selected Features")
             print(select_features)
+            print("Dropped Features")
+            print(list(set(list(X_train.columns)) - set(list(select_features))))
 
             # Filter selected features
             X_train = X_train[select_features]

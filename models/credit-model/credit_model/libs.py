@@ -41,9 +41,6 @@ class PreProc(BaseEstimator, TransformerMixin):
 
     def transform(self, X):
 
-        # Set Data Columns
-        columns = list(X.columns)
-
         # Set Target Feature
         target_column = self.target_column
 
@@ -60,6 +57,9 @@ class PreProc(BaseEstimator, TransformerMixin):
 
         # Train Pre-proc
         if not self.fitted:
+
+            # Set Data Columns
+            columns = list(X.columns)
 
             # Drop unused Features
             X = X.drop(["uuid"], axis=1)

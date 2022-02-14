@@ -189,6 +189,9 @@ class PreProc(BaseEstimator, TransformerMixin):
             # Fill missing data
             X = X.fillna(0)
 
+            # Convert to numeric
+            X = X.apply(pd.to_numeric)
+
         print("Preprocessing finished")
 
         return X
@@ -570,6 +573,7 @@ class Model(BaseEstimator, RegressorMixin):
         # Load model
         regressor = self.model
 
+        print(X)
         # Get predictions
         predictions = pd.DataFrame(
             regressor.predict_proba(X)[:, 1], columns=["predictions"]

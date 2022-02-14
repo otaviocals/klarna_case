@@ -573,7 +573,12 @@ class Model(BaseEstimator, RegressorMixin):
         # Load model
         regressor = self.model
 
-        print(X)
+        print(X.dtypes)
+
+        # Convert to numeric
+        X = X.apply(pd.to_numeric)
+        print(X.dtypes)
+
         # Get predictions
         predictions = pd.DataFrame(
             regressor.predict_proba(X)[:, 1], columns=["predictions"]

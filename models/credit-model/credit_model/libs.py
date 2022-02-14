@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import math
 import awswrangler as wr
+from boto3.session import Session
 from sklearn.base import BaseEstimator, RegressorMixin, TransformerMixin
 from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
@@ -135,8 +136,14 @@ class PreProc(BaseEstimator, TransformerMixin):
 
                 # Online Prediction
                 if len(X) >= 1:
-                    print("Online predcition")
-                    print(X)
+                    aws_session = Session(
+                        aws_access_key_id=os.environ.get("AWS_ACCESS_KEY_ID").strip(
+                            "\n"
+                        ),
+                        aws_secret_access_key=os.environ.get(
+                            "AWS_SECRET_ACCESS_KEY"
+                        ).strip("\n"),
+                    )
                     query = "select * from credit_train_data where uuid IN {}"
                     X = wr.athena.read_sql_query(
                         query.format(
@@ -145,6 +152,7 @@ class PreProc(BaseEstimator, TransformerMixin):
                             .replace("]", ")")
                         ),
                         database="klarna_case",
+                        boto3_session=aws_session,
                     )
                 else:
                     raise

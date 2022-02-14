@@ -576,7 +576,7 @@ class Model(BaseEstimator, RegressorMixin):
         print(X.dtypes)
 
         # Convert to numeric
-        X = X.apply(pd.to_numeric)
+        X = X.astype(float)
         print(X.dtypes)
 
         # Get predictions

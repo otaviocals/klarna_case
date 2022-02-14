@@ -309,10 +309,13 @@ class FeatSelect(BaseEstimator, TransformerMixin):
 
 # Model Operator
 class Model(BaseEstimator, RegressorMixin):
-    def __init__(self, fitted=False, model=None, metrics=None, cutoff=0.5):
+    def __init__(
+        self, fitted=False, model=None, cal_model=None, metrics=None, cutoff=0.5
+    ):
         self.fitted = fitted
         self.cutoff = cutoff
         self.model = model
+        self.cal_model = cal_model
         self.metrics = metrics
 
     def fit(self, X=None, y=None):
@@ -537,8 +540,8 @@ class Model(BaseEstimator, RegressorMixin):
         regressor = grid_regressor.best_estimator_
 
         # Calibrate model
-        # regressor = CalibratedClassifierCV(regressor, cv=5, method="sigmoid")
-        # regressor.fit(X_train, y_train)
+        cal_model = CalibratedClassifierCV(regressor, cv=5, method="sigmoid")
+        cal_model.fit(X_train, y_train)
 
         # Validate model
         test_predictions = pd.Series(regressor.predict(X_test))
@@ -555,6 +558,7 @@ class Model(BaseEstimator, RegressorMixin):
         # Set params for predict
         params = {
             "model": regressor,
+            "cal_model": cal_model,
             "metrics": metrics,
             "fitted": True,
             "cutoff": best_cutoff,
@@ -572,17 +576,21 @@ class Model(BaseEstimator, RegressorMixin):
 
         # Load model
         regressor = self.model
-
-        print(X.dtypes)
+        cal_regressor = self.cal_model
 
         # Convert to numeric
         X = X.astype(float)
-        print(X.dtypes)
 
         # Get predictions
         predictions = pd.DataFrame(
             regressor.predict_proba(X)[:, 1], columns=["predictions"]
         )
+        cal_predictions = pd.DataFrame(
+            cal_regressor.predict_proba(X)[:, 1], columns=["predictions"]
+        )
+
+        print(predictions)
+        print(cal_predictions)
         # predictions.loc[predictions["predictions"] >= self.cutoff, "predictions"] = 1
         # predictions.loc[predictions["predictions"] < self.cutoff, "predictions"] = 0
 

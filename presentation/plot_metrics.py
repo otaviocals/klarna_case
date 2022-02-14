@@ -61,7 +61,7 @@ fitted_train_data = preproc.transform(train_data)
 fitted_train_data = fitted_train_data[model.get_params()["featselect__select_features"]]
 
 metrics = metrics.sort_values(by="roc_auc")
-final_model = final_model.get_params()["base_estimator"]
+#final_model = final_model.get_params()["base_estimator"]
 # Get SHAP Values
 shap_values = shap.TreeExplainer(final_model).shap_values(fitted_train_data)
 

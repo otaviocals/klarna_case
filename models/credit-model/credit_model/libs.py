@@ -309,13 +309,10 @@ class FeatSelect(BaseEstimator, TransformerMixin):
 
 # Model Operator
 class Model(BaseEstimator, RegressorMixin):
-    def __init__(
-        self, fitted=False, model=None, cal_model=None, metrics=None, cutoff=0.5
-    ):
+    def __init__(self, fitted=False, model=None, metrics=None, cutoff=0.5):
         self.fitted = fitted
         self.cutoff = cutoff
         self.model = model
-        self.cal_model = cal_model
         self.metrics = metrics
 
     def fit(self, X=None, y=None):
@@ -539,10 +536,6 @@ class Model(BaseEstimator, RegressorMixin):
         # Get best model
         regressor = grid_regressor.best_estimator_
 
-        # Calibrate model
-        cal_model = CalibratedClassifierCV(regressor, cv=5, method="sigmoid")
-        cal_model.fit(X_train, y_train)
-
         # Validate model
         test_predictions = pd.Series(regressor.predict(X_test))
         test_predictions_proba = pd.Series(regressor.predict_proba(X_test)[:, 1])
@@ -558,7 +551,6 @@ class Model(BaseEstimator, RegressorMixin):
         # Set params for predict
         params = {
             "model": regressor,
-            "cal_model": cal_model,
             "metrics": metrics,
             "fitted": True,
             "cutoff": best_cutoff,
@@ -585,14 +577,11 @@ class Model(BaseEstimator, RegressorMixin):
         predictions = pd.DataFrame(
             regressor.predict_proba(X)[:, 1], columns=["predictions"]
         )
-        cal_predictions = pd.DataFrame(
-            cal_regressor.predict_proba(X)[:, 1], columns=["predictions"]
-        )
 
-        print(predictions)
-        print(cal_predictions)
-        # predictions.loc[predictions["predictions"] >= self.cutoff, "predictions"] = 1
-        # predictions.loc[predictions["predictions"] < self.cutoff, "predictions"] = 0
+        # Calibrate Predictions
+        predictions = predictions.apply(
+            lambda x: 1 / (1 + np.exp(-10 * (x - self.best_cutoff)))
+        )
 
         # Merge Predictions to features
         X = X.merge(predictions, left_index=True, right_index=True)

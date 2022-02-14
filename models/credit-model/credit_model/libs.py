@@ -548,6 +548,14 @@ class Model(BaseEstimator, RegressorMixin):
         print(metrics)
         print("Best cutoff: " + str(best_cutoff))
 
+        metrics = cutoff_analysis(
+            y_test,
+            test_predictions_proba.apply(
+                lambda x: 1 / (1 + np.exp(-10 * (x - best_cutoff)))
+            ),
+        )
+        metrics = metrics.sort_values(by="f1", ascending=False)
+
         # Set params for predict
         params = {
             "model": regressor,
@@ -568,7 +576,6 @@ class Model(BaseEstimator, RegressorMixin):
 
         # Load model
         regressor = self.model
-        cal_regressor = self.cal_model
 
         # Convert to numeric
         X = X.astype(float)

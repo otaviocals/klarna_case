@@ -155,6 +155,7 @@ class PreProc(BaseEstimator, TransformerMixin):
                         database="klarna_case",
                         boto3_session=aws_session,
                     )
+                    X = X[self.columns]
                 else:
                     raise
 

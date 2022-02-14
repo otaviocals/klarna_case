@@ -7,5 +7,5 @@ setup(
     author="Otavio Cals",
     packages=["credit_model"],
     include_package_data=True,
-    install_requires=["catboost", "kserve", "xgboost"],
+    install_requires=["catboost", "kserve", "xgboost", "awswrangler"],
 )

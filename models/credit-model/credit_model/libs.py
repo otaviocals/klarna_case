@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import math
+import awswrangler as wr
 from sklearn.base import BaseEstimator, RegressorMixin, TransformerMixin
 from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
@@ -231,6 +232,14 @@ class PreProc(BaseEstimator, TransformerMixin):
                 # Online Prediction
                 elif len(X.columns) == 1:
                     print("Online predcition")
+                    X = wr.athena.read_sql_query(
+                        query.format(
+                            str(['"' + item + '"' for item in test_uuid])
+                            .replace("[", "(")
+                            .replace("]", ")")
+                        ),
+                        database="klarna_case",
+                    )
 
             if target_column in X.columns:
                 X = X.drop([target_column], axis=1)
@@ -644,8 +653,9 @@ class Model(BaseEstimator, RegressorMixin):
         regressor = self.model
 
         # Get predictions
-        predictions = regressor.predict_proba(X)[:, 1]
-        predictions.columns = ["predictions"]
+        predictions = pd.DataFrame(
+            regressor.predict_proba(X)[:, 1], columns=["predictions"]
+        )
         # predictions.loc[predictions["predictions"] >= self.cutoff, "predictions"] = 1
         # predictions.loc[predictions["predictions"] < self.cutoff, "predictions"] = 0
 

@@ -136,10 +136,11 @@ class PreProc(BaseEstimator, TransformerMixin):
                 # Online Prediction
                 if len(X) >= 1:
                     print("Online predcition")
+                    print(X)
                     query = "select * from credit_train_data where uuid IN {}"
                     X = wr.athena.read_sql_query(
                         query.format(
-                            str(['"' + item + '"' for item in test_uuid])
+                            str(['"' + item + '"' for item in X])
                             .replace("[", "(")
                             .replace("]", ")")
                         ),

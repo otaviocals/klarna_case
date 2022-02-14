@@ -22,13 +22,11 @@ args = {
 }
 
 with DAG(
-    dag_id="test_dag_aws",
+    dag_id="klarna_credit_model_train",
     default_args=args,
     schedule_interval="0 0 * * *",
     start_date=days_ago(2),
     dagrun_timeout=timedelta(minutes=60),
-    tags=["example", "example2"],
-    params={"example_key": "example_value"},
 ) as dag:
 
     test_athena_operator = AWSAthenaOperator(
@@ -39,7 +37,7 @@ with DAG(
     )
 
     train_op = SageMakerTrainingOperator(
-        task_id="test_training",
+        task_id="train_model",
         config=generate_sagemaker_train_config(
             "credit_model",
             "klarna-case-model-bucket",

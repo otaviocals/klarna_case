@@ -58,54 +58,10 @@ final_model = model.get_params()["model__model"]
 
 # Trandform Data
 fitted_train_data = preproc.transform(train_data)
-fitted_train_data = fitted_train_data[
-    [
-        "num_arch_dc_12_24m",
-        "num_arch_dc_0_12m",
-        "account_worst_status_0_3m",
-        "status_max_archived_0_12_months",
-        "num_active_div_by_paid_inv_0_12m",
-        "status_3rd_last_archived_0_24m",
-        "status_max_archived_0_24_months",
-        "has_paid",
-        "num_active_inv",
-        "account_worst_status_12_24m",
-        "account_days_in_term_12_24m",
-        "avg_payment_span_0_12m",
-        "status_max_archived_0_6_months",
-        "num_arch_rem_0_12m",
-        "account_days_in_dc_12_24m",
-        "merchant_group",
-        "avg_payment_span_0_3m",
-        "age",
-        "num_unpaid_bills",
-        "account_days_in_rem_12_24m",
-        "num_arch_ok_12_24m",
-        "merchant_category",
-        "recovery_debt",
-        "num_arch_ok_0_12m",
-        "name_in_email",
-        "max_paid_inv_0_24m",
-        "time_hours",
-        "sum_capital_paid_account_12_24m",
-        "sum_capital_paid_account_0_12m",
-        "max_paid_inv_0_12m",
-        "sum_paid_inv_0_12m",
-        "account_amount_added_12_24m",
-        "worst_status_active_inv",
-        "account_incoming_debt_vs_paid_0_24m",
-        "account_status",
-        "account_worst_status_6_12m",
-        "account_worst_status_3_6m",
-        "num_arch_written_off_0_12m",
-        "status_2nd_last_archived_0_24m",
-        "status_last_archived_0_24m",
-        "num_arch_written_off_12_24m",
-    ]
-]
+fitted_train_data = fitted_train_data[model.get_params()["featselect__select_features"]]
 
 metrics = metrics.sort_values(by="roc_auc")
-final_model =  final_model.get_params()['base_estimator']
+final_model = final_model.get_params()["base_estimator"]
 # Get SHAP Values
 shap_values = shap.TreeExplainer(final_model).shap_values(fitted_train_data)
 
@@ -118,7 +74,7 @@ plt.close()
 ABS_SHAP(shap_values, fitted_train_data)
 
 # Plot Metrics
-f, (ax1, ax2, ax3, ax4) = plt.subplots(4,figsize=(6,7))
+f, (ax1, ax2, ax3, ax4) = plt.subplots(4, figsize=(6, 7))
 f.suptitle("Metrics")
 ax1.bar(metrics["model"], metrics["roc_auc"])
 ax1.set_ylabel("ROC AUC")

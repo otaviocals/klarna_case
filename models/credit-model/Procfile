@@ -1,1 +1,1 @@
-web: python3 -m credit-model.web_server
+web: python3 -m credit_model.web_server

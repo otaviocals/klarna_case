@@ -11,7 +11,7 @@ from sklearn import svm
 import logging
 from sklearn.pipeline import Pipeline
 from sklearn.utils import parallel_backend
-from libs import PreProc, Split, FeatSelect, Model
+from credit_model.libs import PreProc, Split, FeatSelect, Model
 import warnings
 
 warnings.simplefilter(action="ignore", category=FutureWarning)

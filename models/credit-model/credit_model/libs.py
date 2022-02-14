@@ -132,105 +132,9 @@ class PreProc(BaseEstimator, TransformerMixin):
             # Setting up predict data
 
             if type(X).__name__ == "list":
-                X = pd.DataFrame(X)
 
-                # Batch prediction (no target)
-                if len(X.columns) == 42:
-                    print("Batch prediction")
-                    X.columns = [
-                        "uuid",
-                        "account_amount_added_12_24m",
-                        "account_days_in_dc_12_24m",
-                        "account_days_in_rem_12_24m",
-                        "account_days_in_term_12_24m",
-                        "account_incoming_debt_vs_paid_0_24m",
-                        "account_status",
-                        "account_worst_status_0_3m",
-                        "account_worst_status_12_24m",
-                        "account_worst_status_3_6m",
-                        "account_worst_status_6_12m",
-                        "age",
-                        "avg_payment_span_0_12m",
-                        "avg_payment_span_0_3m",
-                        "merchant_category",
-                        "merchant_group",
-                        "has_paid",
-                        "max_paid_inv_0_12m",
-                        "max_paid_inv_0_24m",
-                        "name_in_email",
-                        "num_active_div_by_paid_inv_0_12m",
-                        "num_active_inv",
-                        "num_arch_dc_0_12m",
-                        "num_arch_dc_12_24m",
-                        "num_arch_ok_0_12m",
-                        "num_arch_ok_12_24m",
-                        "num_arch_rem_0_12m",
-                        "num_arch_written_off_0_12m",
-                        "num_arch_written_off_12_24m",
-                        "num_unpaid_bills",
-                        "status_last_archived_0_24m",
-                        "status_2nd_last_archived_0_24m",
-                        "status_3rd_last_archived_0_24m",
-                        "status_max_archived_0_6_months",
-                        "status_max_archived_0_12_months",
-                        "status_max_archived_0_24_months",
-                        "recovery_debt",
-                        "sum_capital_paid_account_0_12m",
-                        "sum_capital_paid_account_12_24m",
-                        "sum_paid_inv_0_12m",
-                        "time_hours",
-                        "worst_status_active_inv",
-                    ]
-                # Validation prediction (with target)
-                elif len(X.columns) == 43:
-                    print("Validation prediction")
-                    X.columns = [
-                        "uuid",
-                        "default",
-                        "account_amount_added_12_24m",
-                        "account_days_in_dc_12_24m",
-                        "account_days_in_rem_12_24m",
-                        "account_days_in_term_12_24m",
-                        "account_incoming_debt_vs_paid_0_24m",
-                        "account_status",
-                        "account_worst_status_0_3m",
-                        "account_worst_status_12_24m",
-                        "account_worst_status_3_6m",
-                        "account_worst_status_6_12m",
-                        "age",
-                        "avg_payment_span_0_12m",
-                        "avg_payment_span_0_3m",
-                        "merchant_category",
-                        "merchant_group",
-                        "has_paid",
-                        "max_paid_inv_0_12m",
-                        "max_paid_inv_0_24m",
-                        "name_in_email",
-                        "num_active_div_by_paid_inv_0_12m",
-                        "num_active_inv",
-                        "num_arch_dc_0_12m",
-                        "num_arch_dc_12_24m",
-                        "num_arch_ok_0_12m",
-                        "num_arch_ok_12_24m",
-                        "num_arch_rem_0_12m",
-                        "num_arch_written_off_0_12m",
-                        "num_arch_written_off_12_24m",
-                        "num_unpaid_bills",
-                        "status_last_archived_0_24m",
-                        "status_2nd_last_archived_0_24m",
-                        "status_3rd_last_archived_0_24m",
-                        "status_max_archived_0_6_months",
-                        "status_max_archived_0_12_months",
-                        "status_max_archived_0_24_months",
-                        "recovery_debt",
-                        "sum_capital_paid_account_0_12m",
-                        "sum_capital_paid_account_12_24m",
-                        "sum_paid_inv_0_12m",
-                        "time_hours",
-                        "worst_status_active_inv",
-                    ]
                 # Online Prediction
-                elif len(X.columns) == 1:
+                if len(X) >= 1:
                     print("Online predcition")
                     X = wr.athena.read_sql_query(
                         query.format(
@@ -240,6 +144,8 @@ class PreProc(BaseEstimator, TransformerMixin):
                         ),
                         database="klarna_case",
                     )
+                else:
+                    raise
 
             if target_column in X.columns:
                 X = X.drop([target_column], axis=1)

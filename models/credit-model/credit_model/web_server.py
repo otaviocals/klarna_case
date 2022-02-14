@@ -45,8 +45,7 @@ class Model(kserve.KFModel):
         return joblib.load("model.joblib")
 
     def predict(self, request):
-        columns = self.model.get_params()["preproc__columns"]
-        data = pd.DataFrame(request["instances"], columns=columns)
+        data = request["instances"]
         predictions = self.model.predict(data)
         return {"predictions": predictions.tolist()}
 

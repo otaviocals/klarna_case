@@ -587,7 +587,7 @@ class Model(BaseEstimator, RegressorMixin):
 
         # Calibrate Predictions
         predictions = predictions.apply(
-            lambda x: 1 / (1 + np.exp(-10 * (x - self.best_cutoff)))
+            lambda x: 1 / (1 + np.exp(-10 * (x - self.cutoff)))
         )
 
         # Merge Predictions to features

@@ -7,14 +7,43 @@ import json
 import pandas as pd
 import joblib
 import re
+import boto3
 from sklearn import svm
 import logging
 from sklearn.pipeline import Pipeline
 from sklearn.utils import parallel_backend
-from credit_model.libs import PreProc, Split, FeatSelect, Model
 import warnings
 
 warnings.simplefilter(action="ignore", category=FutureWarning)
+
+# Install latest package version
+# AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID").strip("\n")
+# AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY").strip("\n")
+
+
+def download_data_webserver(bucket, source_filename, filename):
+    s3 = boto3.client(
+        "s3",
+        # aws_access_key_id=AWS_ACCESS_KEY_ID,
+        # aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
+    )
+    s3.download_file(bucket, source_filename, filename)
+    logging.info("Downloaded data.")
+    return
+
+
+def install(package):
+    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+
+
+download_data_webserver(
+    "klarna-case-model-bucket",
+    "credit-model/code/credit_model-1.0.tar.gz",
+    "credit_model-1.0.tar.gz",
+)
+install("credit_model-1.0.tar.gz")
+
+from credit_model.libs import PreProc, Split, FeatSelect, Model
 
 
 def train():

@@ -604,11 +604,11 @@ class Model(BaseEstimator, RegressorMixin):
         print(grid_regressor.best_params_)
 
         # Get best model
-        regressor_uncal = grid_regressor.best_estimator_
+        regressor = grid_regressor.best_estimator_
 
         # Calibrate model
-        regressor = CalibratedClassifierCV(regressor_uncal, cv=5, method="sigmoid")
-        regressor.fit(X_train, y_train)
+        # regressor = CalibratedClassifierCV(regressor, cv=5, method="sigmoid")
+        # regressor.fit(X_train, y_train)
 
         # Validate model
         test_predictions = pd.Series(regressor.predict(X_test))

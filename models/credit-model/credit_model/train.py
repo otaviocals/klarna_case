@@ -17,15 +17,15 @@ import warnings
 warnings.simplefilter(action="ignore", category=FutureWarning)
 
 # Install latest package version
-# AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID").strip("\n")
-# AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY").strip("\n")
+MODULE_PATH = os.environ.get("SM_MODULE_DIR").strip("\n")
+module_match = re.match("s3://(.*?)/(.*)", MODULE_PATH)
+module_bucket = module_match.group(1)
+module_location = module_match.group(2)
 
 
 def download_data_webserver(bucket, source_filename, filename):
     s3 = boto3.client(
         "s3",
-        # aws_access_key_id=AWS_ACCESS_KEY_ID,
-        # aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
     )
     s3.download_file(bucket, source_filename, filename)
     logging.info("Downloaded data.")
@@ -37,8 +37,8 @@ def install(package):
 
 
 download_data_webserver(
-    "klarna-case-model-bucket",
-    "credit-model/code/credit_model-1.0.tar.gz",
+    module_bucket,
+    module_location,
     "credit_model-1.0.tar.gz",
 )
 install("credit_model-1.0.tar.gz")

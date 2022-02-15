@@ -1,0 +1,54 @@
+version: 0.2
+
+
+env:
+  parameter-store:
+    ssh_key: klarna-case-deploy-key
+    ssh_pub: klarna-case-deploy-key.pub
+phases:
+  install:
+    commands:
+      - echo Entered the install phase...
+      - apt-get update -y
+      - apt-get install -y python3
+      - python3 -m pip install black
+      - curl -sSL "https://github.com/buildpacks/pack/releases/download/v0.23.0/pack-v0.23.0-linux.tgz" | tar -C /usr/local/bin/ --no-same-owner -xzv pack
+    finally:
+      - echo This always runs even if the update or install command fails 
+  pre_build:
+    commands:
+      - echo Entered the pre_build phase...
+      - echo Get ssh key
+      - mkdir -p ~/.ssh
+      - echo "$ssh_key" > ~/.ssh/klarna-deploy-key
+      - echo "$ssh_pub" > ~/.ssh/klarna-deploy-key.pub
+      - chmod 600 ~/.ssh/klarna-deploy-key
+      - eval "$(ssh-agent -s)"
+      - echo Check airflow-app code
+      - python3 -m black --check airflow-app/
+    finally:
+      - echo This always runs even if the login command fails 
+  build:
+    commands:
+      - echo Entered the build phase...
+      - echo Build started on `date`
+      - echo Deploying Airflow
+      - scp -i ~/.ssh/klarna-deploy-key -o StrictHostKeyChecking=no  airflow-app/configs/* admin@44.199.54.220:~/airflow-configs/ # Airflow K8 files
+      - scp -i ~/.ssh/klarna-deploy-key -o StrictHostKeyChecking=no  kserve-app/configs/* admin@44.199.54.220:~/kserve-configs/ # KServe K8 files
+      - scp -i ~/.ssh/klarna-deploy-key -o StrictHostKeyChecking=no  models/credit-model/kserve/* admin@44.199.54.220:~/kserve-configs/ # Klarna credit model K8 files
+      - ssh -i ~/.ssh/klarna-deploy-key -o StrictHostKeyChecking=no  admin@44.199.54.220 -- 'kubectl create secret generic airflow-ssh-secret -n=airflow --from-file=gitSshKey=.ssh/github_key --dry-run=client -o=yaml > airflow-configs/airflow-github-secret.yaml && kubectl apply -f airflow-configs/airflow_config.yaml && kubectl apply -f airflow-configs/airflow-github-secret.yaml && helm upgrade --install airflow airflow-stable/airflow --namespace airflow --version "8.5.2" --values ./airflow-configs/helm_config.yaml && kubectl apply -f kserve-configs/kserve_config.yaml && aws ecr get-login-password --region us-east-1 | sudo docker login --username AWS --password-stdin 025105345127.dkr.ecr.us-east-1.amazonaws.com && sudo kubectl create secret generic secret-registry    --from-file=.dockerconfigjson=/root/.docker/config.json   --type=kubernetes.io/dockerconfigjson -n kserve-models --dry-run=client -o yaml > kserve-configs/docker-credentials.yaml && kubectl apply -f kserve-configs/docker-credentials.yaml && kubectl create secret generic aws-credentials -n kserve-models --from-file=aws-username=.aws/user --from-file=aws-password=.aws/pass --dry-run=client -o yaml > kserve-configs/aws-credentials.yaml && kubectl apply -f kserve-configs/aws-credentials.yaml'
+      - echo Deploying Credit Model
+      - cd models/credit-model
+      - python3 setup.py sdist
+      - aws s3 sync dist s3://klarna-case-model-bucket/credit-model/code
+      # - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 025105345127.dkr.ecr.us-east-1.amazonaws.com
+      # - pack build --builder=gcr.io/buildpacks/builder 025105345127.dkr.ecr.us-east-1.amazonaws.com/klarna-case
+      # - docker push 025105345127.dkr.ecr.us-east-1.amazonaws.com/klarna-case
+      - ssh -i ~/.ssh/klarna-deploy-key -o StrictHostKeyChecking=no  admin@44.199.54.220 -- 'kubectl apply -f kserve-configs/klarna-case-credit-model.yaml && kubectl apply -f kserve-configs/klarna-case-credit-model-ingress.yaml'
+      - cd ../..
+    finally:
+      - echo This always runs even if the install command fails
+  post_build:
+    commands:
+      - echo Entered the post_build phase...
+      - echo Build completed on `date`

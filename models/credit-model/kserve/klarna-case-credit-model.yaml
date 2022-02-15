@@ -1,0 +1,25 @@
+apiVersion: "serving.kserve.io/v1beta1"
+kind: "InferenceService"
+metadata:
+  name: "klarna-case-credit-model"
+  namespace: "kserve-models"
+spec:
+  predictor:
+    imagePullSecrets:
+      - name: secret-registry
+    containers:
+      - name: "klarna-case-credit-model-container"
+        image: "025105345127.dkr.ecr.us-east-1.amazonaws.com/klarna-case:latest"
+        env:
+         - name: AWS_ACCESS_KEY_ID
+           valueFrom:
+             secretKeyRef:
+               name: aws-credentials
+               key: aws-username
+         - name: AWS_SECRET_ACCESS_KEY
+           valueFrom:
+             secretKeyRef:
+               name: aws-credentials
+               key: aws-password
+         - name: AWS_DEFAULT_REGION
+           value: "us-east-1"

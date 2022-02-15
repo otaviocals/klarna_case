@@ -1,0 +1,8 @@
+kserve
+catboost
+joblib
+pandas
+scikit-learn
+numpy
+xgboost
+awswrangler

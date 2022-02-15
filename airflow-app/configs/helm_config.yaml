@@ -29,9 +29,12 @@ airflow:
     # Security
     AIRFLOW__WEBSERVER__EXPOSE_CONFIG: "True"
 
+    # XCOM Serialzier
+    AIRFLOW__CORE__ENABLE_XCOM_PICKLING: "True"
+
     # DAGS
     AIRFLOW__CORE__LOAD_EXAMPLES: "False"
-    AIRFLOW__CODE__DAGS_FOLDER: "/opt/airflowi/dags/repo/airflow-app/dags"
+    AIRFLOW__CODE__DAGS_FOLDER: "/opt/airflow/dags/repo/airflow-app/dags"
 
     #PLUGINS
     AIRFLOW__CORE__PLUGINS_FOLDER: "/opt/airflow/dags/repo/airflow-app/plugins"
@@ -87,6 +90,9 @@ workers:
         target:
           type: Utilization
           averageUtilization: 80
+  extraPipPackages:
+    - "boto3"
+    - "sagemaker"
 
 ###################################
 # Airflow - Flower Configs
@@ -165,6 +171,9 @@ web:
       - protocol: TCP
         port: 8080
         targetPort: 8080
+  extraPipPackages:
+    - "boto3"
+    - "sagemaker"
 
 ###################################
 ## CONFIG | Kubernetes Ingress

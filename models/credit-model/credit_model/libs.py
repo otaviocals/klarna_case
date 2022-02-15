@@ -166,14 +166,11 @@ class PreProc(BaseEstimator, TransformerMixin):
                     print(unique_ids)
                     print(X["uuid"])
 
-                    # X.loc[~(X["uuid"].isin(ids["uuid"])), "missing"] = 1
-                    # X = ids.merge(X, how="left", on="uuid")
                     X["missing"] = X["uuid"].apply(
                         lambda x: 0 if x in unique_ids else 1
                     )
                     X = ids.merge(X, how="left", on="uuid")
                     X["missing"] = X["missing"].fillna(1)
-                    print(X)
                 else:
                     raise
 
@@ -599,6 +596,7 @@ class Model(BaseEstimator, RegressorMixin):
         # Get missing
         X = X.reset_index()
         is_missing = X[["missing", "index"]]
+        print(X)
         X = X.loc[X["missing"] == 0]
         X = X.drop(["missing", "index"], axis=1)
 
@@ -629,4 +627,4 @@ class Model(BaseEstimator, RegressorMixin):
         print("Predicting finished")
 
         # Return predictions
-        return X["predictions"].to_numpy()
+        return X[["uuid", "predictions"]].to_numpy()

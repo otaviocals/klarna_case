@@ -167,10 +167,10 @@ class PreProc(BaseEstimator, TransformerMixin):
                     print(X["uuid"])
 
                     # X.loc[~(X["uuid"].isin(ids["uuid"])), "missing"] = 1
+                    X = ids.merge(X, how="left", on="uuid")
                     X["missing"] = X["uuid"].apply(
                         lambda x: 0 if x in unique_ids else 1
                     )
-                    X = ids.merge(X, how="left", on="uuid")
                     print(X)
                 else:
                     raise
@@ -620,7 +620,9 @@ class Model(BaseEstimator, RegressorMixin):
         print(predictions)
         X = X.merge(predictions, left_index=True, right_index=True)
         X = is_missing.merge(X, how="left", left_index=True, right_index=True)
+        X["predictions"] = X["predictions"].fillna(-1)
         print(X[["missing", "predictions"]])
+        print(X["predictions"])
 
         print("Predicting finished")
 

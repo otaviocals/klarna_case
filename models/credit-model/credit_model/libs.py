@@ -145,6 +145,9 @@ class PreProc(BaseEstimator, TransformerMixin):
                             "AWS_SECRET_ACCESS_KEY"
                         ).strip("\n"),
                     )
+
+                    ids = pd.DataFrame(X, columns=["uuid"])
+
                     query = "select * from credit_train_data where uuid IN {}"
                     X = wr.athena.read_sql_query(
                         query.format(
@@ -156,6 +159,10 @@ class PreProc(BaseEstimator, TransformerMixin):
                         boto3_session=aws_session,
                     )
                     X = X[self.columns]
+
+                    X.loc[~(X["uuid"].isin(ids["uuid"])), "missing"] = 1
+                    X = ids.merge(X, how="left", on="uuid")
+                    X["missing"] = X["missing"].fillna(0)
                 else:
                     raise
 
@@ -300,7 +307,7 @@ class FeatSelect(BaseEstimator, TransformerMixin):
             features = self.select_features
 
             # Filter selected features
-            X = X[features]
+            X = X[features.append("missing")]
 
             print("Filtering features")
 
@@ -577,6 +584,11 @@ class Model(BaseEstimator, RegressorMixin):
         # Load model
         regressor = self.model
 
+        # Get missing
+        is_missing = X["missing"]
+        X = X.loc[X["missing"] == 0]
+        X = X.drop(["missing"], axis=1)
+
         # Convert to numeric
         X = X.astype(float)
 
@@ -592,6 +604,8 @@ class Model(BaseEstimator, RegressorMixin):
 
         # Merge Predictions to features
         X = X.merge(predictions, left_index=True, right_index=True)
+        X = is_missing.merge(X, how="left", left_index=True, right_index=True)
+        print(X[["missing", "prediction"]])
 
         print("Predicting finished")
 

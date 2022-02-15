@@ -171,6 +171,8 @@ class PreProc(BaseEstimator, TransformerMixin):
                     X["missing"] = X["uuid"].apply(
                         lambda x: 0 if x in unique_ids else 1
                     )
+                    X = ids.merge(X, how="left", on="uuid")
+                    x["missing"] = X["missing"].fillna(1)
                     print(X)
                 else:
                     raise

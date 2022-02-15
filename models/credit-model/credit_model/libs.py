@@ -160,9 +160,11 @@ class PreProc(BaseEstimator, TransformerMixin):
                     )
                     X = X[self.columns]
 
-                    X.loc[~(X["uuid"].isin(ids["uuid"])), "missing"] = 1
+                    unique_ids = set(ids["uuid"].unique())
+
+                    # X.loc[~(X["uuid"].isin(ids["uuid"])), "missing"] = 1
+                    X["missing"] = X["uuid"].map(lambda x: 0 if x in unique_ids else 1)
                     X = ids.merge(X, how="left", on="uuid")
-                    X["missing"] = X["missing"].fillna(0)
                     print(X)
                 else:
                     raise
@@ -587,9 +589,10 @@ class Model(BaseEstimator, RegressorMixin):
         regressor = self.model
 
         # Get missing
-        is_missing = X["missing"]
+        X = X.reset_index()
+        is_missing = X[["missing", "index"]]
         X = X.loc[X["missing"] == 0]
-        X = X.drop(["missing"], axis=1)
+        X = X.drop(["missing", "index"], axis=1)
 
         # Convert to numeric
         X = X.astype(float)
@@ -598,6 +601,7 @@ class Model(BaseEstimator, RegressorMixin):
         predictions = pd.DataFrame(
             regressor.predict_proba(X)[:, 1], columns=["predictions"]
         )
+        predictions.index = X.index
 
         # Calibrate Predictions
         predictions = predictions.apply(
@@ -605,9 +609,10 @@ class Model(BaseEstimator, RegressorMixin):
         )
 
         # Merge Predictions to features
+        print(is_missing)
         print(X)
         print(predictions)
-        X = X.merge(predictions, left_index=True, right_index=False)
+        X = X.merge(predictions, left_index=True, right_index=True)
         X = is_missing.merge(X, how="left", left_index=True, right_index=True)
         print(X[["missing", "prediction"]])
 

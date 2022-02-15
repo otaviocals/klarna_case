@@ -1,4 +1,4 @@
-kserve
+kserve==0.7.0 
 catboost
 joblib
 pandas

@@ -163,6 +163,7 @@ class PreProc(BaseEstimator, TransformerMixin):
                     X.loc[~(X["uuid"].isin(ids["uuid"])), "missing"] = 1
                     X = ids.merge(X, how="left", on="uuid")
                     X["missing"] = X["missing"].fillna(0)
+                    print(X)
                 else:
                     raise
 
@@ -305,9 +306,10 @@ class FeatSelect(BaseEstimator, TransformerMixin):
 
             # Load selected features
             features = self.select_features
+            features.append("missing")
 
             # Filter selected features
-            X = X[features.append("missing")]
+            X = X[features]
 
             print("Filtering features")
 
@@ -603,7 +605,9 @@ class Model(BaseEstimator, RegressorMixin):
         )
 
         # Merge Predictions to features
-        X = X.merge(predictions, left_index=True, right_index=True)
+        print(X)
+        print(predictions)
+        X = X.merge(predictions, left_index=True, right_index=False)
         X = is_missing.merge(X, how="left", left_index=True, right_index=True)
         print(X[["missing", "prediction"]])
 

@@ -167,7 +167,7 @@ class PreProc(BaseEstimator, TransformerMixin):
                     print(X["uuid"])
 
                     # X.loc[~(X["uuid"].isin(ids["uuid"])), "missing"] = 1
-                    X = ids.merge(X, how="left", on="uuid")
+                    # X = ids.merge(X, how="left", on="uuid")
                     X["missing"] = X["uuid"].apply(
                         lambda x: 0 if x in unique_ids else 1
                     )

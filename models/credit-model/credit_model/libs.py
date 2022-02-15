@@ -203,7 +203,7 @@ class PreProc(BaseEstimator, TransformerMixin):
             X = X.fillna(0)
 
             # Convert to numeric
-            X = X.apply(pd.to_numeric)
+            # X = X.apply(pd.to_numeric)
 
         print("Preprocessing finished")
 

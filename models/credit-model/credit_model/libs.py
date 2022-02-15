@@ -163,7 +163,9 @@ class PreProc(BaseEstimator, TransformerMixin):
                     unique_ids = set(ids["uuid"].unique())
 
                     # X.loc[~(X["uuid"].isin(ids["uuid"])), "missing"] = 1
-                    X["missing"] = X["uuid"].map(lambda x: 0 if x in unique_ids else 1)
+                    X["missing"] = X["uuid"].apply(
+                        lambda x: 0 if x in unique_ids else 1
+                    )
                     X = ids.merge(X, how="left", on="uuid")
                     print(X)
                 else:
@@ -614,7 +616,7 @@ class Model(BaseEstimator, RegressorMixin):
         print(predictions)
         X = X.merge(predictions, left_index=True, right_index=True)
         X = is_missing.merge(X, how="left", left_index=True, right_index=True)
-        print(X[["missing", "prediction"]])
+        print(X[["missing", "predictions"]])
 
         print("Predicting finished")
 

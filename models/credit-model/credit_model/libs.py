@@ -312,8 +312,9 @@ class FeatSelect(BaseEstimator, TransformerMixin):
         else:
 
             # Load selected features
-            features = self.select_features
+            features = self.select_features.copy()
             features.append("missing")
+            print(features)
 
             # Filter selected features
             X = X[features]

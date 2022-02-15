@@ -21,29 +21,19 @@ For this project the following were developed:
 
     .
     ├── cicd-pipeline/                      # Resources related to the CI/CD pipeline
-    │   ├── Dockerfile                      # Dockerfile of the image used by the CI/CD pipeline
-    │   ├── requirements.txt                # Requirements file for building the CI/CD container
-    │   └── cloudbuild.yaml                 # Cloudbuild configuration file of the CI/CD pipeline
-    ├── airflow_app/                        # MLOps platform developed for the project
-    │   ├── configs/                        # Yaml configuration files of the MLOps environment
-    │   │   ├── airflow_config.yaml         # Kubernetes resources configuration files
-    │   │   └── helm_config.yaml            # Airflow Helm chart
+    │   └── buildspec.yaml                  # CodePipeline configuration file of the CI/CD pipeline
+    ├── airflow-app/                        # MLOps platform developed for the project
+    │   ├── configs/                        # Kubernetes yaml configuration files of the MLOps environment
     │   ├── dags/                           # DAGs developed for model training and prediction
-    │   │   ├── klarna_model_train.py       # DAG for model training
-    │   │   ├── klarna_model_predict.py     # DAG for generating model predictions
-    │   │   └── sql/                        # SQL queries for data extraction used by the project's DAGs
-    │   └── plugins/                        # Custom Airflow Operators developed for interacting with Google Cloud resources
+    │   └── plugins/                        # Custom Airflow Operators developed for interacting with AWS resources
     ├── models/                             # Models developed for the project
-    │   └── credit-model/                   # Regression model developed for the case
-    │       ├── setup.py                    # Script for packing the model
-    │       └── credit_model/               # Developed libs for the model
-    │           ├── gcp_utils.py            # Lib of functions for downloading and uploading data from GCS
-    │           ├── train.py                # Script for building the model pipeline, fitting the model to the data and exporting results
-    │           └── libs.py                 # Lib of operators for the steps of the model pipeline
+    │   └── credit-model/                   # Classification model developed for the case
+    │       ├── credit_model/               # Model libs
+    │       ├── kserve/                     # KServe endpoint cofiguration files
+    │       └── train_image/                # Custom image for running custom training jobs in SageMaker
+    ├── kserve-app/                         # KServe framework cofiguration files
     └── presentation/                       # Resources related to the project presentation
-        ├── plot_metrics.py                 # Script for generating the graphics of the presentation
-        ├── *.png                           # Image files of the presentation
-        └── model_klarna.pdf                # Project presentation
+        └── eda_plots/                      # Distribution plots for EDA
 ## Architecture
 
 Workflow architecture of the MLOps platform:

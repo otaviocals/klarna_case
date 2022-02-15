@@ -158,9 +158,13 @@ class PreProc(BaseEstimator, TransformerMixin):
                         database="klarna_case",
                         boto3_session=aws_session,
                     )
+                    X["uuid"] = X["uuid0"].apply(lambda x: x.str.strip('"'))
                     X = X[self.columns]
 
+                    # Handle missing IDs
                     unique_ids = set(ids["uuid"].unique())
+                    print(unique_ids)
+                    print(X["uuid"])
 
                     # X.loc[~(X["uuid"].isin(ids["uuid"])), "missing"] = 1
                     X["missing"] = X["uuid"].apply(

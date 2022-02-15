@@ -163,8 +163,6 @@ class PreProc(BaseEstimator, TransformerMixin):
 
                     # Handle missing IDs
                     unique_ids = set(ids["uuid"].unique())
-                    print(unique_ids)
-                    print(X["uuid"])
 
                     X["missing"] = X["uuid"].apply(
                         lambda x: 0 if x in unique_ids else 1
@@ -178,7 +176,7 @@ class PreProc(BaseEstimator, TransformerMixin):
                 X = X.drop([target_column], axis=1)
 
             # Drop unused Features
-            X = X.drop(["uuid"], axis=1)
+            # X = X.drop(["uuid"], axis=1)
 
             # Load Categorical and Geographical Encoders
             encoders = self.encoders
@@ -313,8 +311,7 @@ class FeatSelect(BaseEstimator, TransformerMixin):
 
             # Load selected features
             features = self.select_features.copy()
-            features.append("missing")
-            print(features)
+            features.extend(["uuid", "missing"])
 
             # Filter selected features
             X = X[features]
@@ -596,8 +593,7 @@ class Model(BaseEstimator, RegressorMixin):
 
         # Get missing
         X = X.reset_index()
-        is_missing = X[["missing", "index"]]
-        print(X)
+        is_missing = X[["uuid", "missing", "index"]]
         X = X.loc[X["missing"] == 0]
         X = X.drop(["missing", "index"], axis=1)
 
@@ -616,14 +612,9 @@ class Model(BaseEstimator, RegressorMixin):
         )
 
         # Merge Predictions to features
-        print(is_missing)
-        print(X)
-        print(predictions)
         X = X.merge(predictions, left_index=True, right_index=True)
         X = is_missing.merge(X, how="left", left_index=True, right_index=True)
         X["predictions"] = X["predictions"].fillna(-1)
-        print(X[["missing", "predictions"]])
-        print(X["predictions"])
 
         print("Predicting finished")
 

@@ -145,6 +145,9 @@ class PreProc(BaseEstimator, TransformerMixin):
                             "AWS_SECRET_ACCESS_KEY"
                         ).strip("\n"),
                     )
+
+                    ids = pd.DataFrame(X, columns=["uuid"])
+
                     query = "select * from credit_train_data where uuid IN {}"
                     X = wr.athena.read_sql_query(
                         query.format(
@@ -155,7 +158,17 @@ class PreProc(BaseEstimator, TransformerMixin):
                         database="klarna_case",
                         boto3_session=aws_session,
                     )
+                    X["uuid"] = X["uuid"].apply(lambda x: x.strip('"'))
                     X = X[self.columns]
+
+                    # Handle missing IDs
+                    unique_ids = set(ids["uuid"].unique())
+
+                    X["missing"] = X["uuid"].apply(
+                        lambda x: 0 if x in unique_ids else 1
+                    )
+                    X = ids.merge(X, how="left", on="uuid")
+                    X["missing"] = X["missing"].fillna(1)
                 else:
                     raise
 
@@ -163,7 +176,7 @@ class PreProc(BaseEstimator, TransformerMixin):
                 X = X.drop([target_column], axis=1)
 
             # Drop unused Features
-            X = X.drop(["uuid"], axis=1)
+            # X = X.drop(["uuid"], axis=1)
 
             # Load Categorical and Geographical Encoders
             encoders = self.encoders
@@ -190,7 +203,7 @@ class PreProc(BaseEstimator, TransformerMixin):
             X = X.fillna(0)
 
             # Convert to numeric
-            X = X.apply(pd.to_numeric)
+            # X = X.apply(pd.to_numeric)
 
         print("Preprocessing finished")
 
@@ -297,7 +310,8 @@ class FeatSelect(BaseEstimator, TransformerMixin):
         else:
 
             # Load selected features
-            features = self.select_features
+            features = self.select_features.copy()
+            features.extend(["uuid", "missing"])
 
             # Filter selected features
             X = X[features]
@@ -577,6 +591,12 @@ class Model(BaseEstimator, RegressorMixin):
         # Load model
         regressor = self.model
 
+        # Get missing
+        X = X.reset_index()
+        is_missing = X[["uuid", "missing", "index"]]
+        X = X.loc[X["missing"] == 0]
+        X = X.drop(["uuid", "missing", "index"], axis=1)
+
         # Convert to numeric
         X = X.astype(float)
 
@@ -584,6 +604,7 @@ class Model(BaseEstimator, RegressorMixin):
         predictions = pd.DataFrame(
             regressor.predict_proba(X)[:, 1], columns=["predictions"]
         )
+        predictions.index = X.index
 
         # Calibrate Predictions
         predictions = predictions.apply(
@@ -592,8 +613,10 @@ class Model(BaseEstimator, RegressorMixin):
 
         # Merge Predictions to features
         X = X.merge(predictions, left_index=True, right_index=True)
+        X = is_missing.merge(X, how="left", left_index=True, right_index=True)
+        X["predictions"] = X["predictions"].fillna(-1)
 
         print("Predicting finished")
 
         # Return predictions
-        return X["predictions"].to_numpy()
+        return X[["uuid", "predictions"]].to_numpy()

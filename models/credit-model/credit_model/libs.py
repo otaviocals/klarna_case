@@ -595,7 +595,7 @@ class Model(BaseEstimator, RegressorMixin):
         X = X.reset_index()
         is_missing = X[["uuid", "missing", "index"]]
         X = X.loc[X["missing"] == 0]
-        X = X.drop(["missing", "index"], axis=1)
+        X = X.drop(["uuid", "missing", "index"], axis=1)
 
         # Convert to numeric
         X = X.astype(float)

@@ -32,7 +32,7 @@ with DAG(
     refresh_cred = SSHOperator(
         task_id="redeploy_webserver",
         ssh_conn_id="master-node-ssh",
-        command="./auto_aws_auth.sh",
+        command=".//auto_aws_auth.sh",
     )
 
 
